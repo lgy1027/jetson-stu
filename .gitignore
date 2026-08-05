@@ -23,6 +23,8 @@ ros2_ws/log/
 # Models, datasets, videos and generated outputs
 models/
 data/
+perception/inputs/
+perception/outputs/
 *.engine
 *.plan
 *.onnx

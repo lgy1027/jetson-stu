@@ -4,7 +4,7 @@ This file is the entry point for any Codex instance working in this repository. 
 
 ## What we are doing
 
-The user is transitioning from LLM application engineering into Jetson and embodied-intelligence engineering. This repository tracks a structured 12-week, 84-day learning program and contains the exercises, diagnostics, benchmarks, ROS 2 packages, robot descriptions, task-planning code, and final portfolio project.
+The user is transitioning from LLM application engineering into Jetson and embodied-intelligence engineering. This repository tracks a Day 0 environment setup plus 30 practice-day learning program and contains the exercises, diagnostics, benchmarks, ROS 2 packages, robot descriptions, task-planning code, and final portfolio project.
 
 The first-stage capstone is:
 
@@ -38,16 +38,14 @@ LLMs/VLMs may perform semantic interpretation, task decomposition, and skill sel
 - 14-core ARM CPU, 128GB unified memory, 1TB NVMe
 - Power mode observed as MAXN
 
-Use `docs/system-baseline.md` as the authoritative environment record. Do not treat the CUDA version shown by `nvidia-smi` as proof that nvcc or the CUDA development toolkit is installed; validate them separately.
+Treat this file and the checked-in diagnostics as the current environment record. Do not treat the CUDA version shown by `nvidia-smi` as proof that nvcc or the CUDA development toolkit is installed; validate them separately.
 
 ## Current progress
 
-- [x] Learning direction and 12-week design completed.
-- [x] Day 1 completed: repository structure, system baseline, and NVIDIA stack concepts.
-- [x] Day 2 completed: ordinary-user SSH key authentication, scp, tmux persistence, htop, systemctl, and journalctl.
-- [ ] Day 3 is next: validate CUDA and AI components with an actual GPU computation/deviceQuery-style test, then document GPU architecture and unified memory behavior.
+- [x] Day 0 completed: system baseline, SSH, CUDA real computation, and Docker GPU container validation.
+- [ ] Day 1 is next: build the first reproducible image-processing program.
 
-Last updated: 2026-08-04.
+Last updated: 2026-08-05.
 
 ## Authoritative documents
 
@@ -55,38 +53,38 @@ Read these in order:
 
 1. `AGENTS.md` — current handoff and operating rules.
 2. `README.md` — repository overview and visible progress.
-3. `docs/2026-08-03-jetson-embodied-ai-learning-design.md` — goals and architecture of the learning path.
-4. `docs/2026-08-03-jetson-embodied-ai-learning-plan.md` — authoritative daily checklist.
-5. `docs/system-baseline.md` — hardware and software baseline.
-6. The latest `docs/dayNN-*.md` file — detailed notes from the most recently completed day.
+3. `docs/README.md` — course entry point.
+4. `docs/course-plan.md` — authoritative Day 0 + 30-day practice plan.
+5. `docs/course/README.md` — daily lesson index.
+6. The current day's `docs/course/day-NN-*.md` courseware.
 
 If these files disagree, pause and reconcile them rather than silently choosing one.
 
-## How to continue a study day
+## How to continue a study session
 
-1. Read the relevant Day section from the 12-week plan.
+1. Read the current day's courseware and its acceptance criteria.
 2. Review it critically for compatibility with the current JetPack and ARM64 environment.
 3. Tell the user what will be done and what requires interaction on the Jetson.
-4. Prefer read-only checks before installing or changing system configuration.
-5. Execute the day in small batches with explicit verification.
-6. Do not mark a checkbox complete until its acceptance condition has evidence.
-7. Save commands, logs, versions, measurements, and conclusions in this repository.
-8. At the end of the day, update all three:
-   - the Day checklist in the 12-week plan;
+4. Limit environment checks to those needed to unblock the current implementation; do not repeat already verified checks.
+5. Let the user execute experiments by default. Use remote execution only when explicitly asked.
+6. Execute the session in small batches with explicit verification.
+7. Do not mark a day complete until its acceptance condition has evidence.
+8. Save commands, logs, versions, measurements, and conclusions in this repository.
+9. At the end of a day, update all three:
+   - the course plan's progress;
    - progress in `README.md`;
-   - `Current progress`, `Day N is next`, and `Last updated` in this file.
+   - `Current progress`, the next milestone, and `Last updated` in this file.
 
-## Immediate next task: Day 3
+## Immediate next task: Day 1 — First reproducible processed image
 
-The Day 3 plan requires:
+The lesson requires:
 
-1. Verify `nvcc --version`, `nvidia-smi`, cuDNN packages, and TensorRT packages. The package-level checks already passed on Day 1; reuse that evidence instead of repeating unnecessary installation.
-2. Compile and run a minimal CUDA program or an official `deviceQuery` equivalent that performs real GPU work.
-3. Record GPU name, Compute Capability, unified-memory capacity/behavior, compiler/runtime versions, and PASS/FAIL output.
-4. Save the source and reproducible command under `diagnostics/` or an appropriate CUDA learning directory.
-5. Create a Day 3 note and update the learning checklist only after the test passes or a reproducible failure is documented.
+1. Create `perception/image_pipeline.py` to read an image, resize it, annotate it, and save an output image.
+2. Run it against two input images and inspect the saved results.
+3. Implement a clear error path for an invalid input file.
+4. Do not install PyTorch or collect GPU metrics today; those belong to the later lessons that need them.
 
-Do not begin Day 4 until Day 3 evidence is saved.
+Do not spend a separate session on generic monitoring checks; instrument the next real compute workload instead.
 
 ## Repository and security rules
 

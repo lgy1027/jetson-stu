@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   BookOpen, CaretDown, CaretRight, CheckCircle, Circle, Clock,
-  Code, Cube, ListChecks, PlayCircle, RocketLaunch, Target,
+  CaretUp, Code, Compass, Cube, FileCode, ListChecks, PlayCircle, RocketLaunch, Target,
 } from '@phosphor-icons/react';
+import { courseLessons, courseSourceFiles, foundationsMarkdown } from 'virtual:jetson-courseware';
 
 const weeks = [
+  {
+    name: 'Start', subtitle: '环境与工作流', color: 'lime',
+    days: [['Day 00', '环境与工作流', '用一天建立可复现的 Jetson 开发方式']],
+  },
   {
     name: 'Week 01', subtitle: '视觉与 GPU 基础', color: 'lime',
     days: [
@@ -68,56 +74,72 @@ const weeks = [
 ];
 
 const tabs = [
-  { id: 'lesson', label: '课件', icon: BookOpen },
-  { id: 'tutorial', label: '教程', icon: PlayCircle },
-  { id: 'practice', label: '实践', icon: Code },
+  { id: 'lesson', label: '任务卡', icon: BookOpen },
+  { id: 'tutorial', label: '操作教程', icon: PlayCircle },
+  { id: 'practice', label: '动手实践', icon: Code },
   { id: 'check', label: '验收', icon: ListChecks },
 ];
 
 function buildLesson([day, title, goal], week) {
-  const n = Number(day.slice(-2));
+  const source = courseLessons.find((item) => item.day === day);
   return {
     day, title, goal, week,
     time: '3–4 小时',
-    concepts: ['先构建最小可运行闭环', '每一步留下可复现证据', '把安全边界写成代码'],
-    tutorial: [
-      `先阅读本节的目标，写下你认为「${title}」的输入与输出。`,
-      '按课件拆成最小步骤；每执行一条命令，观察并解释输出。',
-      '遇到错误先保存完整报错，再用假设—验证的方式定位。',
-      '将命令、结果与结论写进当天笔记，形成自己的排障资料库。',
-    ],
-    practice: [
-      `完成一个围绕「${title}」的最小实验，不追求功能堆叠。`,
-      '为实验设置一个能被验证的输入，并保留原始输出。',
-      '故意修改一个条件，比较预期与实际结果。',
-      '提交或保存当天的源代码、命令记录和 3 句话结论。',
-    ],
-    checks: [
-      '命令或程序能在 Jetson 上从头复现。',
-      '能用自己的话解释输入、处理和输出。',
-      '关键结果已记录，没有只靠“看起来能跑”。',
-    ],
-    artifact: `day-${String(n).padStart(2, '0')} 的实验记录`,
+    question: source?.question || goal,
+    concepts: source?.concepts?.length ? source.concepts : ['先构建最小可运行闭环', '每一步留下可复现证据'],
+    practice: source?.practice?.length ? source.practice : ['完成最小实验并记录原始输出。'],
+    checks: source?.checks?.length ? source.checks : ['命令或程序能在 Jetson 上从头复现。'],
+    reflection: source?.reflection || '用自己的话解释今天的关键决策。',
+    outcomes: source?.outcomes?.length ? source.outcomes : source?.checks?.slice(0, 2) || [],
+    tutorialMarkdown: source?.tutorialMarkdown || source?.markdown || `## 今天的问题\n\n${goal}`,
   };
 }
 
 const lessons = weeks.flatMap((week) => week.days.map((d) => buildLesson(d, week)));
 
+function CourseMarkdown({ children, onOpenCode }) {
+  return <ReactMarkdown components={{
+    a: ({ href, children: linkChildren }) => href?.startsWith('#course-file:')
+      ? <button className="source-link" onClick={() => onOpenCode(href.slice('#course-file:'.length))}><FileCode size={17} />{linkChildren}</button>
+      : <a href={href} target="_blank" rel="noreferrer">{linkChildren}</a>,
+  }}>{children}</ReactMarkdown>;
+}
+
+function SourceDialog({ path, source, onClose }) {
+  if (!path || !source) return null;
+  return <div className="source-modal-backdrop" role="presentation" onMouseDown={onClose}>
+    <section className="source-modal" role="dialog" aria-modal="true" aria-label={`源码：${path}`} onMouseDown={(event) => event.stopPropagation()}>
+      <div className="source-file-head"><div><p className="eyebrow">COURSE SOURCE · LIVE FILE</p><h2><FileCode size={22} /> {path}</h2><p>这是仓库中的真实文件；修改它后，课程中的完整源码会同步更新。</p></div><button className="source-close" onClick={onClose}><CaretUp size={17} /> 收起代码</button></div>
+      <pre><code>{source}</code></pre>
+    </section>
+  </div>;
+}
+
 export function App() {
   const [activeDay, setActiveDay] = useState('Day 01');
   const [activeTab, setActiveTab] = useState('lesson');
-  const [openWeek, setOpenWeek] = useState(0);
+  const [openWeek, setOpenWeek] = useState(1);
+  const [viewingFoundations, setViewingFoundations] = useState(false);
+  const [expandedCode, setExpandedCode] = useState(null);
   const [done, setDone] = useState(() => JSON.parse(localStorage.getItem('jetson-course-done') || '[]'));
   const lesson = lessons.find((item) => item.day === activeDay) || lessons[0];
   const lessonIndex = lessons.findIndex((item) => item.day === activeDay);
   const completed = useMemo(() => new Set(done), [done]);
+  const completedMainDays = done.filter((day) => day !== 'Day 00').length;
 
   useEffect(() => localStorage.setItem('jetson-course-done', JSON.stringify(done)), [done]);
+  useEffect(() => {
+    const closeOnEscape = (event) => { if (event.key === 'Escape') setExpandedCode(null); };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
 
   const chooseDay = (day, index) => {
     setActiveDay(day);
     setOpenWeek(index);
     setActiveTab('lesson');
+    setViewingFoundations(false);
+    setExpandedCode(null);
   };
   const toggleDone = (key) => setDone((current) => current.includes(key)
     ? current.filter((item) => item !== key) : [...current, key]);
@@ -127,6 +149,8 @@ export function App() {
     setActiveDay(target.day);
     setOpenWeek(weeks.indexOf(target.week));
     setActiveTab('lesson');
+    setViewingFoundations(false);
+    setExpandedCode(null);
   };
 
   return (
@@ -134,12 +158,15 @@ export function App() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Jetson Studio 首页"><Cube size={22} weight="fill" /> JETSON STUDIO</a>
         <div className="topbar-meta"><span className="online-dot" />学习路线已就绪 <span className="divider" /> Day 0 完成</div>
-        <button className="outline-button" onClick={() => setActiveTab('check')}><ListChecks size={18} /> 学习进度 {done.length}/30</button>
+        <button className="outline-button" onClick={() => { setViewingFoundations(false); setActiveTab('check'); }}><ListChecks size={18} /> 学习进度 {completedMainDays}/30</button>
       </header>
 
       <div className="workspace" id="top">
         <aside className="roadmap">
-          <div className="roadmap-head"><p className="eyebrow">30 DAYS / 6 WEEKS</p><h2>学习路线</h2><p>每周 5 天主课，第 6 天用于复盘、补实验或休息。</p></div>
+          <div className="roadmap-head"><p className="eyebrow">DAY 0 + 30 DAYS / 6 WEEKS</p><h2>学习路线</h2><p>Day 0 只做环境与工作流；之后每周 5 天主课，第 6 天用于复盘、补实验或休息。</p></div>
+          <button className={`foundations-button ${viewingFoundations ? 'active' : ''}`} onClick={() => { setViewingFoundations(true); setActiveTab('lesson'); }}>
+            <Compass size={20} weight="duotone" /><span><b>入门必读</b><small>Jetson 概念地图 · Day 0 前阅读</small></span><CaretRight size={16} />
+          </button>
           <nav aria-label="课程周次">
             {weeks.map((week, wi) => (
               <section className={`week-block ${openWeek === wi ? 'is-open' : ''}`} key={week.name}>
@@ -158,6 +185,13 @@ export function App() {
         </aside>
 
         <section className="lesson-panel">
+          {viewingFoundations ? <>
+            <div className="lesson-topline"><span className="status-pill lime">BEFORE DAY 0 · FOUNDATION</span><span><Clock size={16} /> 25–35 分钟</span></div>
+            <h1>Jetson 概念地图</h1>
+            <p className="lesson-goal"><Compass size={20} weight="fill" /> 先建立共同语言，再开始环境与实践。</p>
+            <article className="content-card markdown-lesson foundations-lesson"><CourseMarkdown onOpenCode={setExpandedCode}>{foundationsMarkdown}</CourseMarkdown></article>
+            <footer className="lesson-footer"><button onClick={() => chooseDay('Day 00', 0)}>进入 Day 0 →</button><span>这页不计入 30 天进度，但建议每位新同学先读完。</span><span /></footer>
+          </> : <>
           <div className="lesson-topline"><span className={`status-pill ${lesson.week.color}`}>{lesson.week.name} · {lesson.day}</span><span><Clock size={16} /> {lesson.time}</span></div>
           <h1>{lesson.title}</h1>
           <p className="lesson-goal"><Target size={20} weight="fill" /> {lesson.goal}</p>
@@ -166,20 +200,19 @@ export function App() {
             {tabs.map(({ id, label, icon: Icon }) => <button role="tab" aria-selected={activeTab === id} className={activeTab === id ? 'selected' : ''} key={id} onClick={() => setActiveTab(id)}><Icon size={18} />{label}</button>)}
           </div>
 
-          {activeTab === 'lesson' && <div className="content-grid">
-            <article className="content-card overview-card"><p className="eyebrow">TODAY'S MISSION</p><h2>先理解闭环，再写代码。</h2><p>今天不做无目的的命令巡检。我们只为一个明确问题搭建最小实验：{lesson.goal}</p><div className="concept-list">{lesson.concepts.map((item) => <span key={item}>{item}</span>)}</div></article>
-            <article className="hero-card"><img src="/assets/vision-pipeline-hero.png" alt="Jetson 上的视觉计算流程" /><div><p>FROM INPUT TO EVIDENCE</p><b>输入 → 处理 → 证据</b></div></article>
-          </div>}
+          {activeTab === 'lesson' && <article className="content-card overview-card"><p className="eyebrow">TODAY'S MISSION</p><h2>今天先搞清楚什么？</h2><p>{lesson.question}</p><h3>完成后你应当拥有</h3><ul className="overview-list">{lesson.outcomes.map((item) => <li key={item}><CheckCircle size={18} weight="fill" />{item}</li>)}</ul><div className="concept-list">{lesson.concepts.map((item) => <span key={item}>{item}</span>)}</div></article>}
 
-          {activeTab === 'tutorial' && <article className="content-card instruction-card"><p className="eyebrow">GUIDED TUTORIAL</p><h2>执行节奏</h2><ol>{lesson.tutorial.map((step) => <li key={step}>{step}</li>)}</ol></article>}
+          {activeTab === 'tutorial' && <article className="content-card markdown-lesson"><CourseMarkdown onOpenCode={setExpandedCode}>{lesson.tutorialMarkdown}</CourseMarkdown></article>}
           {activeTab === 'practice' && <article className="content-card instruction-card"><p className="eyebrow">HANDS-ON LAB</p><h2>今天由你操作</h2><ol>{lesson.practice.map((step) => <li key={step}>{step}</li>)}</ol><div className="command-note"><Code size={20} /><span>需要命令时，课件会给出“复制 → 执行 → 观察 → 解释”的小批次，而不是一次性的大段检查。</span></div></article>}
-          {activeTab === 'check' && <article className="content-card instruction-card"><p className="eyebrow">ACCEPTANCE</p><h2>完成标准</h2><ul className="check-list">{lesson.checks.map((item) => <li key={item}><CheckCircle size={19} weight="fill" />{item}</li>)}</ul><p className="artifact"><RocketLaunch size={19} /> 当日产物：<b>{lesson.artifact}</b></p><button className={`complete-button ${completed.has(lesson.day) ? 'done' : ''}`} onClick={() => toggleDone(lesson.day)}>{completed.has(lesson.day) ? <CheckCircle size={19} weight="fill" /> : <Circle size={19} />}{completed.has(lesson.day) ? '已标记完成' : '完成本课后标记'}</button></article>}
+          {activeTab === 'check' && <article className="content-card instruction-card"><p className="eyebrow">ACCEPTANCE</p><h2>完成标准</h2><ul className="check-list">{lesson.checks.map((item) => <li key={item}><CheckCircle size={19} weight="fill" />{item}</li>)}</ul><p className="artifact"><RocketLaunch size={19} /> 复盘问题：<b>{lesson.reflection}</b></p><button className={`complete-button ${completed.has(lesson.day) ? 'done' : ''}`} onClick={() => toggleDone(lesson.day)}>{completed.has(lesson.day) ? <CheckCircle size={19} weight="fill" /> : <Circle size={19} />}{completed.has(lesson.day) ? '已标记完成' : '完成本课后标记'}</button></article>}
 
           <footer className="lesson-footer"><button onClick={() => go(-1)} disabled={lessonIndex === 0}>← 上一课</button><span>你的节奏优先：第 6 天留作机动，不强行赶进度。</span><button onClick={() => go(1)} disabled={lessonIndex === lessons.length - 1}>下一课 →</button></footer>
+          </>}
         </section>
 
-        <aside className="focus-panel"><p className="eyebrow">TODAY / FOCUS</p><h2>学习不是“跑过命令”，而是留下证据。</h2><div className="focus-rule"><span>01</span><p>你执行<br /><b>我解释与导航</b></p></div><div className="focus-rule"><span>02</span><p>小批次操作<br /><b>每次都验证结果</b></p></div><div className="focus-rule"><span>03</span><p>记录失败<br /><b>把它变成能力</b></p></div><div className="progress-box"><div><span>总进度</span><b>{Math.round(done.length / 30 * 100)}%</b></div><div className="progress-track"><i style={{ width: `${done.length / 30 * 100}%` }} /></div><small>{done.length} / 30 个课程日已完成</small></div></aside>
+        <aside className="focus-panel"><p className="eyebrow">TODAY / FOCUS</p><h2>学习不是“跑过命令”，而是留下证据。</h2><div className="focus-rule"><span>01</span><p>先看任务卡<br /><b>确认目标与概念</b></p></div><div className="focus-rule"><span>02</span><p>再读操作教程<br /><b>按小步骤理解与执行</b></p></div><div className="focus-rule"><span>03</span><p>最后实践与验收<br /><b>把结果变成能力</b></p></div><div className="progress-box"><div><span>主线进度</span><b>{Math.round(completedMainDays / 30 * 100)}%</b></div><div className="progress-track"><i style={{ width: `${completedMainDays / 30 * 100}%` }} /></div><small>{completedMainDays} / 30 个主课日已完成</small></div></aside>
       </div>
+      <SourceDialog path={expandedCode} source={courseSourceFiles[expandedCode]} onClose={() => setExpandedCode(null)} />
     </main>
   );
 }

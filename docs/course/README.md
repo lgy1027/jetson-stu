@@ -4,6 +4,7 @@
 
 | 周次 | 目标 | 每日课件 |
 |---|---|---|
+| 入门前 | 建立 Jetson、部署与机器人软件的共同语言 | [概念地图](foundations.md) |
 | Day 0 | 环境与工作方式就绪 | [Day 0：环境与工作流](day-00-environment.md) |
 | Week 1 | 建立可复现的视觉输入、处理与推理闭环 | [Day 1：处理图片](day-01-image-pipeline.md) · [Day 2：图像变换](day-02-image-ops.md) · [Day 3：GPU 张量](day-03-gpu-tensors.md) · [Day 4：模型推理](day-04-model-inference.md) · [Day 5：视频推理](day-05-video-inference.md) |
 | Week 2 | 尽早拥有 ROS 2 的可运行骨架 | [Day 6：工作空间](day-13-ros2-workspace.md) · [Day 7：Topic 契约](day-14-ros2-topics.md) · [Day 8：感知节点](day-15-perception-node.md) · [Day 9：参数与 Launch](day-16-parameters-launch.md) · [Day 10：Rosbag 回放](day-18-rosbag-integration.md) |
@@ -18,6 +19,8 @@
 2. 你亲手执行；每个小批次都先观察、解释，再继续。
 3. 把命令、原始输出和你的结论保存为当天产物。
 4. 只有完成验收条件，才标记该课程日完成。
+
+前端中的 **任务卡 → 操作教程 → 动手实践 → 验收** 对应同一份 Markdown 课件的四个职责，不是把同一段内容复制到四个标签。
 
 从 [Day 1：第一张可复现的处理图片](day-01-image-pipeline.md) 开始。
 

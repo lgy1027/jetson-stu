@@ -1,0 +1,33 @@
+2026-08-04T14:40:52+08:00
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2026 NVIDIA Corporation
+Built on Thu_Mar_19_11:11:41_PM_PDT_2026
+Cuda compilation tools, release 13.2, V13.2.78
+Build cuda_13.2.r13.2/compiler.37668154_0
+Tue Aug  4 14:40:52 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.78                 Driver Version: 595.78         CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA Thor                    Off |   00000000:01:00.0 Off |                  N/A |
+| N/A   38C  N/A               1W /  N/A  | Not Supported          |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            2545      G   /usr/lib/xorg/Xorg                       18MiB |
+|    0   N/A  N/A            2619      G   /usr/bin/gnome-shell                      5MiB |
++-----------------------------------------------------------------------------------------+
+libcudnn9-cuda-13	9.20.0.46-1
+libcudnn9-samples	9.20.0.46-1
+libnvinfer-dev	10.16.2.10-1+cuda13.2
+libnvinfer10	10.16.2.10-1+cuda13.2
+tensorrt	10.16.2.10-1+cuda13.2
+TensorRT Python: 10.16.2.10
