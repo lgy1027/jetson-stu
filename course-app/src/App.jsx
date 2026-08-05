@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   BookOpen, CaretDown, CaretRight, CheckCircle, Circle, Clock,
-  CaretUp, Code, Compass, Cube, FileCode, ListChecks, PlayCircle, RocketLaunch, Target,
+  CaretUp, Code, Compass, Cube, FileCode, ListChecks, PlayCircle, RocketLaunch, Target, WechatLogo,
 } from '@phosphor-icons/react';
 import { courseLessons, courseSourceFiles, foundationsMarkdown } from 'virtual:jetson-courseware';
+
+const contactQrImage = `${import.meta.env.BASE_URL}assets/contact-wechat-qr.jpg`;
 
 const weeks = [
   {
@@ -158,6 +160,7 @@ export function App() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Jetson Studio 首页"><Cube size={22} weight="fill" /> JETSON STUDIO</a>
         <div className="topbar-meta"><span className="online-dot" />学习路线已就绪 <span className="divider" /> Day 0 完成</div>
+        <div className="contact-wrap"><button className="contact-button" aria-describedby="wechat-contact-card"><WechatLogo size={18} weight="fill" /> 联系我</button><div className="qr-popover" id="wechat-contact-card" role="tooltip"><img src={contactQrImage} alt="微信联系二维码" /><span>微信扫码联系我</span></div></div>
         <button className="outline-button" onClick={() => { setViewingFoundations(false); setActiveTab('check'); }}><ListChecks size={18} /> 学习进度 {completedMainDays}/30</button>
       </header>
 
@@ -212,6 +215,7 @@ export function App() {
 
         <aside className="focus-panel"><p className="eyebrow">TODAY / FOCUS</p><h2>学习不是“跑过命令”，而是留下证据。</h2><div className="focus-rule"><span>01</span><p>先看任务卡<br /><b>确认目标与概念</b></p></div><div className="focus-rule"><span>02</span><p>再读操作教程<br /><b>按小步骤理解与执行</b></p></div><div className="focus-rule"><span>03</span><p>最后实践与验收<br /><b>把结果变成能力</b></p></div><div className="progress-box"><div><span>主线进度</span><b>{Math.round(completedMainDays / 30 * 100)}%</b></div><div className="progress-track"><i style={{ width: `${completedMainDays / 30 * 100}%` }} /></div><small>{completedMainDays} / 30 个主课日已完成</small></div></aside>
       </div>
+      <footer className="site-footer"><span>本项目属于 <b>合肥枢维智能科技有限公司</b></span><span>© 2026 · Apache-2.0 · 版权、专利与商标声明见 LICENSE / NOTICE</span></footer>
       <SourceDialog path={expandedCode} source={courseSourceFiles[expandedCode]} onClose={() => setExpandedCode(null)} />
     </main>
   );

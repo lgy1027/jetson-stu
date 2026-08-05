@@ -49,3 +49,7 @@ jetson-stu/
 
 - [x] Day 0：环境与工作流就绪
 - [ ] Day 1：第一张可复现的处理图片
+
+## 版权与许可
+
+Copyright © 2026 合肥枢维智能科技有限公司。项目采用 [Apache License 2.0](LICENSE)，其中包含明确的版权、专利授权与商标使用边界；归属声明见 [NOTICE](NOTICE)。
