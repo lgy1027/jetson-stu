@@ -2,7 +2,7 @@
 
 ## 今天的问题
 
-如何让 TensorRT 针对当前 Thor、CUDA 和 TensorRT 版本优化 ONNX 模型？
+如何让 TensorRT 针对目标 Jetson、CUDA 和 TensorRT 版本优化 ONNX 模型？
 
 ## 你要掌握
 

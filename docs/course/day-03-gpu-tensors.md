@@ -1,4 +1,4 @@
-# Day 3：让 PyTorch 真正使用 Thor GPU
+# Day 3：让 PyTorch 真正使用 GPU
 
 > 今天第一次在真实工作负载中使用 PyTorch GPU。监控只在计算发生时采一次；不要把它变成独立的“看数字练习”。
 
@@ -33,7 +33,7 @@
 python3 -c 'import torch; print(torch.__version__, torch.cuda.is_available(), torch.version.cuda)'
 ```
 
-如果导入失败或 CUDA 为 `False`，不要安装 x86/PC 教程里的随机 wheel。记录 JetPack、Ubuntu 24.04、ARM64 和 Python 版本，查 NVIDIA 针对当前 JetPack 的官方兼容安装说明后再安装。把实际使用的安装命令和版本写入当天记录；这一步的目标是兼容性，不是“装最新版”。
+如果导入失败或 CUDA 为 `False`，不要安装 x86/PC 教程里的随机 wheel。记录 JetPack、操作系统、CPU 架构和 Python 版本，查 NVIDIA 针对当前软件栈的官方兼容安装说明后再安装。把实际使用的安装命令和版本写入当天记录；这一步的目标是兼容性，不是“装最新版”。
 
 ### 2. 阅读并运行矩阵工作负载（45 分钟）
 

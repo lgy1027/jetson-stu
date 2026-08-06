@@ -11,7 +11,7 @@
 
 ## 实践
 
-1. 核对 ROS 2 Jazzy 与 Ubuntu 24.04 ARM64 的兼容路径；仅在缺失时安装必要组件。
+1. 核对 ROS 2 发行版与当前系统、CPU 架构的兼容路径；仅在缺失时安装必要组件。
 2. 创建 `ros2_ws/src` 下的 Python package。
 3. 编写最小 publisher 和 subscriber，使用自定义节点名与 topic 名。
 4. 用 `colcon build` 构建、source workspace 后运行两个节点。

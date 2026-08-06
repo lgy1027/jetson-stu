@@ -68,7 +68,7 @@ python3 -m json.tool perception/outputs/day02/wide_annotated.json
 python3 -m pytest -q perception/test_image_ops.py
 ```
 
-如果没有 `pytest`，当天只安装这个测试工具。Ubuntu 24.04 的系统 Python 通常不允许直接用 pip 改系统环境，因此使用发行版包：
+如果没有 `pytest`，当天只安装这个测试工具。现代 Ubuntu 的系统 Python 通常不允许直接用 pip 改系统环境，因此使用发行版包：
 
 ```bash
 sudo apt update

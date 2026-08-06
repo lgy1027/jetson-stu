@@ -25,7 +25,7 @@
 推理层       Python、PyTorch（训练/原型）、ONNX、ONNX Runtime、TensorRT
 加速层       CUDA、cuDNN、NVIDIA 驱动
 系统层       Ubuntu、Jetson Linux（L4T）、JetPack、Docker
-硬件层       Jetson AGX Thor、摄像头、机械臂、传感器
+硬件层       Jetson 设备、摄像头、机械臂、传感器
 ```
 
 上层依赖下层，但不需要在第一天把每一层都装一遍。课程会在真正需要某层时再引入它：先建立图像输入输出，再接 ROS 2，再做部署、坐标和规划。
@@ -36,7 +36,7 @@
 - **Jetson Linux / L4T**：Jetson 专用的底层 Linux、内核、驱动与板级支持包。L4T 是历史名称，日常可把它理解为“Jetson 的系统与驱动层”。
 - **JetPack**：Jetson 的软件发行套件，包含 Jetson Linux，以及 CUDA、cuDNN、TensorRT 等相互匹配的组件版本。装软件前首先确认 JetPack 与 Ubuntu / ARM64 的兼容性，不要只看普通 PC 的教程。
 
-你的设备已经记录了 JetPack 7.2、Ubuntu 24.04 ARM64 与 CUDA 13.2。它们是 Day 0 的已验证基线；后续不重复查询，只在某个实践确实需要时记录版本与结果。
+现在不需要查询或背诵具体版本。后续只在安装或运行某个实践确有兼容性风险时，再确认相关软件栈是否匹配，并把当次结论记录在实践产物中。
 
 ## GPU 推理与部署组件
 
