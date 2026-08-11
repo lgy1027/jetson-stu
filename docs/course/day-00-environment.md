@@ -1,6 +1,6 @@
 # Day 0：环境与工作流
 
-> Day 0 只用一天。目标不是背版本号，而是证明你能从自己的电脑稳定进入 Jetson、恢复工作现场，并运行一次真实 GPU 计算。已完成本日的同学只需保留产物记录，不必重复执行。
+> Day 0 建立 Jetson 软件栈和实验记录基线。目标不是背诵版本号，而是证明当前设备能够编译并执行一次真实 CUDA 计算，并且后续实验有统一的记录边界。
 
 ## 今天的问题
 
@@ -9,86 +9,119 @@
 ## 你要掌握
 
 - JetPack 是 Jetson 的兼容性基线；CUDA 是 GPU 计算平台；cuDNN 与 TensorRT 分别服务于深度学习算子和推理优化。
-- `nvidia-smi` 的 CUDA 字段只反映驱动可报告的兼容能力；`nvcc` 与真实计算才构成开发/运行证据。
-- SSH、tmux 与 Git 是让实验可恢复的工作流工具，不是本周单独学习的主题。
+- `nvidia-smi` 的 CUDA 字段只反映驱动可报告的兼容能力；`nvcc` 与真实计算才构成开发和运行证据。
+- 安装、版本和实验输出必须与具体实践关联，不能用一份模糊的“环境正常”替代证据。
 
 ## 今天完成后你能做到什么
 
-1. 从 Mac 免密 SSH 登录普通 Jetson 用户，并知道如何退出。
-2. 断开后恢复 tmux 工作会话。
-3. 在仓库中运行一次既有 CUDA 烟雾测试，保留 PASS 证据。
-4. 知道后续安装只能由当天实践目标触发。
+1. 读取并记录 JetPack、L4T、CUDA、cuDNN 和 TensorRT 的当前版本。
+2. 编译并运行一次 CUDA 烟雾测试，确认数值结果正确。
+3. 验证 Docker GPU 运行时的既有结果，不重复安装容器环境。
+4. 建立后续课程统一使用的实验记录格式。
 
 ## 本单元产物
 
-- 产物：SSH 可用、tmux 会话、`diagnostics/day03-cuda-smoke-output.txt` 或等价终端记录。
+- `diagnostics/day03-component-checks.txt` 或等价版本记录；
+- `diagnostics/day03-cuda-smoke-output.txt`；
+- `diagnostics/day04-container-gpu-output.txt` 与 `diagnostics/day04-docker-runtime-checks.txt`（已有记录可直接复用）；
+- 一段说明 JetPack、CUDA、cuDNN、TensorRT 职责的个人笔记。
 
 ## 操作教程
 
-### 1. 从 Mac 连接
+### 1. 确认仓库和当前用户
 
-在 Mac 终端执行，将占位符替换为你的普通 Jetson 用户和当前局域网地址；不要使用 root：
+在 Jetson 的普通开发用户终端执行：
 
 ```bash
-ssh <jetson-user>@<jetson-lan-ip>
+cd ~/jetson-stu
+pwd
 whoami
 hostname
 ```
 
-预期：`whoami` 显示普通用户。首次连接可能询问主机指纹；只在确认是自己的 Jetson 后接受。若仍要求密码，检查 Mac 的 `~/.ssh` 私钥权限与 Jetson 的 `~/.ssh/authorized_keys`，不要关闭 SSH 的安全校验。
+`whoami` 不应显示 `root`。仓库路径以设备上的实际路径为准；后续命令均从仓库根目录执行。
 
-### 2. 建立可恢复终端
+### 2. 记录 Jetson 软件栈
 
-在 Jetson 上执行：
+查看仓库中已有的组件检查记录，并在需要时补充以下实时信息：
 
 ```bash
-if ! command -v tmux >/dev/null; then
-  sudo apt update
-  sudo apt install -y tmux
-fi
-tmux new -s jetson-study
-pwd
+sed -n '1,160p' diagnostics/day03-component-checks.txt
+cat /etc/nv_tegra_release
+nvcc --version
+python3 --version
 ```
 
-在 tmux 中按 `Ctrl-b` 再按 `d` 断开会话；回到普通 shell 后执行：
+然后确认 Python 能导入 TensorRT（如果当前系统已提供绑定）：
 
 ```bash
-tmux attach -t jetson-study
+python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)'
 ```
 
-预期：你能看到之前的 `pwd`。以后网络临时断开时，实验不会丢失。
+不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。当前仓库的已验证基线是 JetPack 7.2-b187、L4T R39.2、Ubuntu 24.04 ARM64、CUDA Toolkit 13.2、TensorRT 10.16.2.10；如果设备输出不同，应记录差异，不要静默覆盖环境记录。
 
-### 3. 只验证一次真实 CUDA 工作
+### 3. 编译并运行真实 CUDA 计算
 
-先阅读而不是直接运行：[展开 `day03_cuda_smoke.cu`](#course-file:diagnostics/day03_cuda_smoke.cu)。说明它为什么比“GPU 列表存在”更有力：它编译 CUDA 代码、执行核函数、把结果取回并检查数值。
-
-在 Jetson 仓库根目录执行已有测试；若文件名已不同，使用你 Day 0 已验证的等价测试，不新建另一套：
+烟雾测试会编译 CUDA 源码、执行 kernel、取回结果并进行数值校验：
 
 ```bash
-cd ~/jetson-stu
 nvcc diagnostics/day03_cuda_smoke.cu -o /tmp/day03_cuda_smoke
 /tmp/day03_cuda_smoke | tee diagnostics/day03-cuda-smoke-output.txt
 ```
 
-预期：有明确 `PASS` 或数值校验成功的结论。若 `nvcc` 不存在，停止在这里记录完整报错；不要根据 `nvidia-smi` 推测 Toolkit 已安装。
+预期输出包含明确的 `PASS` 或数值校验成功结论。如果 `nvcc` 不存在，保留完整报错并停止在这里；不要根据驱动信息推测 Toolkit 已安装。
 
-### 4. 建立每个单元的最小记录
+### 4. 复核既有容器 GPU 证据
 
-每次实践只记录四件事：输入、命令、原始输出、你的结论。Day 1 开始，代码都放在 `perception/`，结果放在被忽略的 `perception/outputs/`，不要把大图片、模型权重或 TensorRT 引擎直接提交到 Git。
+Day 0 已经完成 Docker GPU 容器验证。本单元只检查既有记录：
+
+```bash
+sed -n '1,120p' diagnostics/day04-container-gpu-output.txt
+sed -n '1,120p' diagnostics/day04-docker-runtime-checks.txt
+```
+
+如果记录不存在，补做一次最小的 GPU 容器验证并保存输出；不要为了 Day 0 安装 PyTorch、ROS 2、Isaac ROS 或完整 DeepStream 环境。
+
+### 5. 建立实验记录格式
+
+每个后续实践至少记录四项：
+
+```text
+输入：文件、模型、参数或数据范围
+命令：实际执行的命令和配置
+原始输出：终端、JSON、图片、视频或测试结果
+结论：成功条件、异常、版本和下一步
+```
+
+代码放在对应的 `perception/`、`ros2_ws/src/`、`robot_description/` 或 `task_planner/` 目录；生成图片、视频、模型和 TensorRT engine 遵循 `.gitignore` 规则，不直接提交到 Git。
+
+## 常见问题与诊断顺序
+
+| 现象 | 先检查什么 | 结论 |
+|---|---|---|
+| `nvcc: command not found` | CUDA Toolkit 是否安装，PATH 是否正确 | 不能声称开发工具链可用 |
+| 驱动能看到 GPU，但编译失败 | `nvcc`、头文件、库路径和 JetPack 版本 | 驱动可见不等于 Toolkit 可用 |
+| CUDA 程序运行但数值错误 | kernel、内存拷贝和校验逻辑 | 不能只看进程退出码 |
+| TensorRT Python 导入失败 | 绑定是否由当前 JetPack 提供 | 不要从普通 x86 Python 环境复制包 |
+| Docker 容器不能访问 GPU | NVIDIA Container Runtime 记录和容器参数 | 不要把宿主机 CUDA 路径硬挂载到任意镜像 |
 
 ## 实践
 
-1. 完成一次 SSH 登录和一次 tmux 恢复。
-2. 阅读 CUDA 烟雾测试，运行一次并保存原始输出。
-3. 写下 JetPack、CUDA、cuDNN、TensorRT 各自的一句话职责。
+1. 在普通用户终端进入仓库并记录主机和软件栈。
+2. 编译、运行 CUDA 烟雾测试并保存原始输出。
+3. 复核既有 Docker GPU 验证记录。
+4. 写下四项组件职责和当前环境与课程的兼容性结论。
 
 ## 产物与验收
 
-- [ ] SSH 使用普通用户，未启用远程 root 登录。
-- [ ] tmux 会话可从断连后恢复。
-- [ ] 真实 CUDA 测试有可保存的 PASS 证据。
-- [ ] 能解释“驱动可见 GPU”与“CUDA 程序可编译并正确计算”的区别。
+- [ ] 当前用户不是 `root`，仓库路径正确。
+- [ ] JetPack/L4T、CUDA Toolkit、Python 和 TensorRT 版本有记录。
+- [ ] CUDA 测试有可保存的 PASS 或数值校验证据。
+- [ ] 已理解驱动可见 GPU、`nvcc` 可用和 CUDA 程序正确计算是三件不同的事。
+- [ ] 已建立后续实践使用的输入、命令、输出、结论记录格式。
 
 ## 复盘
 
 为什么“驱动能看到 GPU”不等于“你的 CUDA 程序能编译并正确运行”？
+
+Day 0 完成后，从 [Day 1：第一张可复现的处理图片](day-01-image-pipeline.md) 开始；不在 Day 0 预装后续所有框架。
