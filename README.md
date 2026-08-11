@@ -1,8 +1,10 @@
-# jetson-stu
+# Jetson 具身智能实战课程
 
-Jetson AGX Thor 与具身智能学习项目。
+面向有 Python、深度学习或大模型基础的学习者，系统学习 Jetson 端侧 AI 与具身智能工程。
 
-本项目按照“Day 0 环境就绪 + 6 个里程碑、30 个弹性实践单元”的学习计划推进，目标是从 Jetson 端侧 AI 部署出发，完成 ROS 2 感知流水线、三维目标转换、机械臂运动规划，以及受约束的自然语言任务执行闭环。
+课程采用“Day 0 环境就绪 + 6 个里程碑 + 30 个弹性实践单元”的路线，目标是完成从图像感知、CUDA/TensorRT 加速、ROS 2 通信、三维坐标变换，到机械臂仿真规划和安全任务执行的完整闭环。Day 是稳定编号，不是日历期限；每个单元以可运行产物和验收证据为完成标准。
+
+线上课程：[lgy1027.github.io/jetson-stu](https://lgy1027.github.io/jetson-stu/)
 
 ## 测试设备
 
@@ -11,13 +13,12 @@ Jetson AGX Thor 与具身智能学习项目。
 - Ubuntu 24.04 ARM64
 - 1TB NVMe SSD
 
-当前已验证的软件环境与操作规则见 [交接入口](AGENTS.md)。
+课程会在需要时记录具体软件版本和兼容性要求；学习者应以自己 Jetson 上的现场检查结果为准。
 
 ## 学习文档
 
-- [Codex跨设备交接入口](AGENTS.md)
 - [课程入口](docs/README.md)
-- [Day 0 + 30个实践单元](docs/course-plan.md)
+- [Day 0 + 30 个实践单元](docs/course-plan.md)
 - [每日课件](docs/course/README.md)
 - [可点击课程工作台](course-app/README.md)
 
@@ -28,27 +29,27 @@ jetson-stu/
 ├── README.md             # 项目入口
 ├── docs/                 # 学习计划、笔记和报告
 ├── course-app/           # 可点击的课程、目标、教程和验收工作台
-├── diagnostics/          # Jetson诊断与环境检查脚本
+├── diagnostics/          # CUDA、容器和环境检查工具
 ├── benchmarks/           # 延迟、吞吐、温度和功耗数据
-├── perception/           # OpenCV、PyTorch、ONNX和TensorRT实验
+├── perception/           # OpenCV、PyTorch、ONNX 和 TensorRT 实验
 ├── ros2_ws/src/          # ROS 2 packages
-├── robot_description/    # URDF/Xacro和机器人配置
-├── task_planner/         # 语言任务、技能Schema和状态机
+├── robot_description/    # URDF/Xacro 和机器人配置
+├── task_planner/         # 语言任务、技能 Schema 和状态机
 └── demo/                 # 演示配置、素材和说明
 ```
 
 ## 学习原则
 
-1. 每天留下可检查的产物，而不是只看教程。
-2. 先做确定性机器人技能，再接入LLM/VLM。
-3. 实验必须记录软件版本、输入、延迟、温度和功耗。
-4. 不把LLM直接接入电机控制；动作必须经过Schema、安全约束和规划器。
+1. 每个单元留下可检查的产物，而不是只看教程。
+2. 先做确定性机器人技能，再接入 LLM/VLM。
+3. 实验记录软件版本、输入、延迟、温度和功耗。
+4. 不把 LLM 直接接入电机控制；动作必须经过 Schema、安全约束和规划器。
 5. 当前没有机器人硬件，第一阶段使用图片、视频和仿真数据。
 
 ## 当前进度
 
-- [x] Day 0：环境与工作流就绪
-- [ ] Day 1：第一张可复现的处理图片
+- [x] Day 0：环境与工作流
+- [ ] Day 1：第一张可复现的处理图片（下一单元）
 
 ## 版权与许可
 
