@@ -57,7 +57,7 @@ PY
 1. 查 [NVIDIA PyTorch for Jetson 兼容矩阵](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html)，寻找明确对应当前 JetPack 的版本；
 2. 查 [NVIDIA Jetson PyTorch 安装说明](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)，确认采用 wheel、容器还是其他官方路径；
 3. 核对 Python ABI、ARM64、CUDA 和 cuDNN 要求；
-4. 把候选方案、来源 URL 和选择理由写入 `diagnostics/day03-pytorch-install-decision.md`；
+4. 把候选方案、来源 URL 和选择理由写入 `diagnostics/day03/pytorch-install-decision.md`；
 5. 只有兼容关系明确后才安装并继续。
 
 不要使用 `sudo pip`，也不要把 `--break-system-packages` 当作默认解法。若使用虚拟环境或容器，后面的 Day 4/5 必须继续使用同一个运行环境。
@@ -67,9 +67,10 @@ PY
 完整文件：[展开 `day03_gpu_tensors.py`](#course-file:perception/day03_gpu_tensors.py)。先找出四处关键证据：同一对 CPU 随机输入被复制到两种设备、`cuda:0`、两次同步、`max_abs_error`。
 
 ```bash
-# 从仓库根目录运行 CPU/GPU 张量对照实验，并保存输出。
+# 创建证据目录，从仓库根目录运行 CPU/GPU 张量对照实验，并保存输出。
 cd ~/jetson-stu
-python3 perception/day03_gpu_tensors.py | tee diagnostics/gpu-tensors-output.txt
+mkdir -p diagnostics/day03
+python3 perception/day03_gpu_tensors.py | tee diagnostics/day03/gpu-tensors-output.txt
 ```
 
 脚本会在计时前执行一次不计时的预热，然后同步 CUDA。预期输出 `cuda available: True`、GPU 名称、CPU/GPU 结果设备、耗时、加速比与很小的误差。浮点误差不一定为零；如果误差异常大，先停止并检查随机数、dtype 和累加顺序。
@@ -80,7 +81,7 @@ python3 perception/day03_gpu_tensors.py | tee diagnostics/gpu-tensors-output.txt
 
 ```bash
 # 每秒采样 Jetson 的 GPU、CPU 和内存活动，观察真实计算期间的负载。
-tegrastats --interval 1000 | tee diagnostics/gpu-tensors-tegrastats.log
+tegrastats --interval 1000 | tee diagnostics/day03/gpu-tensors-tegrastats.log
 ```
 
 矩阵脚本结束后停止 `tegrastats`。你只需确认 GPU/内存活动和负载在计算期有变化；不要将空闲状态的读数当作结论。如果默认负载结束太快，可提高 `--size` 或 `--repeats`，但必须避免让系统进入不可响应状态。
@@ -92,9 +93,9 @@ tegrastats --interval 1000 | tee diagnostics/gpu-tensors-tegrastats.log
 ```bash
 # 只改变矩阵规模，分别保存两次可比较的性能结果。
 python3 perception/day03_gpu_tensors.py --size 1024 --repeats 8 \
-  | tee diagnostics/gpu-tensors-1024.txt
+  | tee diagnostics/day03/gpu-tensors-1024.txt
 python3 perception/day03_gpu_tensors.py --size 2048 --repeats 8 \
-  | tee diagnostics/gpu-tensors-2048.txt
+  | tee diagnostics/day03/gpu-tensors-2048.txt
 ```
 
 记录矩阵尺寸、重复次数、CPU ms、GPU ms、加速比和最大误差。规模不同的两次运行用于观察趋势，不用于宣称某个固定加速比。

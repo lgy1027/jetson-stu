@@ -41,5 +41,5 @@ perception/outputs/
 *.pem
 *.key
 
-# Per-device Day 0 evidence (may contain hostnames, versions, and runtime details)
-diagnostics/day00/
+# Per-device evidence (may contain hostnames, versions, and runtime details)
+diagnostics/day0*/

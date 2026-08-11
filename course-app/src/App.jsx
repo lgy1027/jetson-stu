@@ -214,7 +214,7 @@ export function App() {
           </>}
         </section>
 
-        <aside className="focus-panel"><p className="eyebrow">CURRENT / FOCUS</p><h2>学习不是“跑过命令”，而是留下证据。</h2><div className="focus-rule"><span>01</span><p>先看任务卡<br /><b>确认目标与概念</b></p></div><div className="focus-rule"><span>02</span><p>再读操作教程<br /><b>按小步骤理解与执行</b></p></div><div className="focus-rule"><span>03</span><p>最后实践与验收<br /><b>把结果变成能力</b></p></div><div className="progress-box"><div><span>主线进度</span><b>{Math.round(completedMainDays / 30 * 100)}%</b></div><div className="progress-track"><i style={{ width: `${completedMainDays / 30 * 100}%` }} /></div><small>{completedMainDays} / 30 个实践单元已完成</small></div></aside>
+        <aside className="focus-panel"><p className="eyebrow">CURRENT / FOCUS</p><h2>学习不是“跑过命令”，而是留下证据。</h2><div className="focus-rule"><span>01</span><p>先看任务卡<br /><b>确认目标与概念</b></p></div><div className="focus-rule"><span>02</span><p>再读操作教程<br /><b>按小步骤理解与执行</b></p></div><div className="focus-rule"><span>03</span><p>最后实践与验收<br /><b>把结果变成能力</b></p></div><div className="progress-box"><div><span>主线进度</span><b>{Math.round(completedMainDays / 30 * 100)}%</b></div><div className="progress-track"><i style={{ width: `${completedMainDays / 30 * 100}%` }} /></div><small>{completedMainDays} / 30 个实践单元已完成</small><small>进度仅保存在当前浏览器，不会影响其他访问者。</small></div></aside>
       </div>
       <footer className="site-footer"><span>本项目属于 <b>合肥枢维智能科技有限公司</b></span><span>© 2026 · Apache-2.0 · 版权、专利与商标声明见 LICENSE / NOTICE</span></footer>
       <SourceDialog path={expandedCode} source={courseSourceFiles[expandedCode]} onClose={() => setExpandedCode(null)} />

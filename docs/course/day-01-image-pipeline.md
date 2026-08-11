@@ -53,9 +53,9 @@
 在 Jetson 终端执行。请逐块执行，不要整段粘贴后不看输出。
 
 ```bash
-# 进入仓库、创建今天的输入输出目录，并确认 OpenCV 可导入。
+# 进入仓库、创建今天的输入输出和证据目录，并确认 OpenCV 可导入。
 cd ~/jetson-stu
-mkdir -p perception/inputs perception/outputs
+mkdir -p perception/inputs perception/outputs diagnostics/day01
 python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
 ```
 
@@ -189,7 +189,7 @@ echo "exit code: $?"
   python3 perception/image_pipeline.py perception/inputs/wide.png perception/outputs/wide_480.png --width 480
   python3 perception/image_pipeline.py perception/inputs/tall.png perception/outputs/tall_300.png --width 300
   python3 perception/image_pipeline.py perception/inputs/not-here.png perception/outputs/should-not-exist.png
-} > diagnostics/day01-image-pipeline.txt 2>&1
+} > diagnostics/day01/image-pipeline.txt 2>&1
 ```
 
 最后一条命令预期失败，因此整个命令组可能返回非零；证据文件仍应包含前两次成功和最后一次失败。验收时同时查看文件内容和实际输出图。
@@ -223,7 +223,7 @@ echo "exit code: $?"
 - [ ] 你亲眼检查过两张输出图片；
 - [ ] 不存在的输入文件产生清楚的错误，并以退出码 2 结束；
 - [ ] 存在但不可解码的文件不会产生输出图；
-- [ ] `diagnostics/day01-image-pipeline.txt` 或等价记录包含成功和失败证据；
+- [ ] `diagnostics/day01/image-pipeline.txt` 或等价记录包含成功和失败证据；
 - [ ] 你能解释为什么只检查“文件存在”还不够。
 
 ## 与后续课程的连接

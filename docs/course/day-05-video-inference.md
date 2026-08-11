@@ -37,9 +37,9 @@
 优先复用 Day 4 的许可图片生成确定性输入视频。完整文件：[展开 `day05_make_sample_video.py`](#course-file:perception/day05_make_sample_video.py)。
 
 ```bash
-# 创建 Day 5 的目录，并把 Day 4 图片生成确定性输入视频。
+# 创建 Day 5 的输入输出和证据目录，并把 Day 4 图片生成确定性输入视频。
 cd ~/jetson-stu
-mkdir -p perception/inputs/day05 perception/outputs/day05
+mkdir -p perception/inputs/day05 perception/outputs/day05 diagnostics/day05
 python3 perception/day05_make_sample_video.py \
   perception/inputs/day04 \
   perception/inputs/day05/day04-slideshow.mp4 \
@@ -75,7 +75,7 @@ python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every5.mp4 \
   --device cuda:0 \
-  --every 5 | tee diagnostics/day05-video-inference-output.txt
+  --every 5 | tee diagnostics/day05/video-inference-output.txt
 python3 -m json.tool perception/outputs/day05/annotated-every5.json
 ```
 
@@ -95,7 +95,7 @@ python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every1.mp4 \
   --device cuda:0 --every 1 \
-  | tee diagnostics/day05-video-every1-output.txt
+  | tee diagnostics/day05/video-every1-output.txt
 ```
 
 比较 `annotated-every1.json` 与 `annotated-every5.json` 中的推理次数、平均推理延迟、wall time 和端到端 FPS，并解释画面标签更新频率为何不同。输入视频、模型、权重和设备必须保持不变。

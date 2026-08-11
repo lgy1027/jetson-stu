@@ -37,9 +37,9 @@
 创建目录并放入至少 10 张你有权使用的 JPG/PNG。来源可为自己拍摄、公开许可素材或你已拥有的数据；在 `source-notes.txt` 记录来源和许可。当前没有相机时，优先使用公开许可、内容多样的静态图片。
 
 ```bash
-# 进入仓库、创建 Day 4 的输入输出目录，并统计当前输入文件数量。
+# 进入仓库、创建 Day 4 的输入输出和证据目录，并统计当前输入文件数量。
 cd ~/jetson-stu
-mkdir -p perception/inputs/day04 perception/outputs/day04
+mkdir -p perception/inputs/day04 perception/outputs/day04 diagnostics/day04
 find perception/inputs/day04 -type f | wc -l
 ```
 
@@ -52,7 +52,7 @@ find perception/inputs/day04 -type f | wc -l
 find perception/inputs/day04 -maxdepth 1 -type f \
   \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
   -print0 | sort -z | xargs -0 sha256sum \
-  > diagnostics/day04-input-sha256.txt
+  > diagnostics/day04/input-sha256.txt
 ```
 
 哈希不替代许可说明；它用于确认以后复测时是不是同一批字节输入。
@@ -87,7 +87,7 @@ python3 perception/day04_infer_images.py \
   perception/inputs/day04 \
   perception/outputs/day04 \
   --device cuda:0 \
-  --top-k 3 | tee diagnostics/day04-image-inference-output.txt
+  --top-k 3 | tee diagnostics/day04/image-inference-output.txt
 python3 -m json.tool perception/outputs/day04/results.json | head -80
 ```
 

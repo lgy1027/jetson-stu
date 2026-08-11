@@ -48,8 +48,9 @@
 完整文件：[展开 `image_ops.py`](#course-file:perception/image_ops.py)。先看四个函数各自的输入与输出，再运行：
 
 ```bash
-# 运行图像变换程序，检查标注图片和结构化 JSON 输出。
+# 创建证据目录，运行图像变换程序，并检查标注图片和结构化 JSON 输出。
 cd ~/jetson-stu
+mkdir -p diagnostics/day02
 python3 perception/image_ops.py
 file perception/outputs/day02/wide_annotated.png
 python3 -m json.tool perception/outputs/day02/wide_annotated.json
@@ -95,8 +96,8 @@ python3 -m pytest -q perception/test_image_ops.py
 
 ```bash
 # 保存程序、测试和 JSON 校验的原始输出，作为本单元验收证据。
-python3 perception/image_ops.py | tee diagnostics/day02-image-ops.txt
-python3 -m pytest -q perception/test_image_ops.py | tee diagnostics/day02-image-ops-tests.txt
+python3 perception/image_ops.py | tee diagnostics/day02/image-ops.txt
+python3 -m pytest -q perception/test_image_ops.py | tee diagnostics/day02/image-ops-tests.txt
 python3 -m json.tool perception/outputs/day02/wide_annotated.json > /dev/null \
   && echo "PASS: valid JSON"
 ```
