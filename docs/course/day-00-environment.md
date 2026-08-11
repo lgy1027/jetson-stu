@@ -16,15 +16,17 @@
 
 1. 读取并记录 JetPack、L4T、CUDA、cuDNN 和 TensorRT 的当前版本。
 2. 编译并运行一次 CUDA 烟雾测试，确认数值结果正确。
-3. 验证 Docker GPU 运行时的既有结果，不重复安装容器环境。
+3. 在当前设备上验证 Docker GPU 运行时，不把仓库里的历史结果当作自己的证据。
 4. 建立后续课程统一使用的实验记录格式。
 
 ## 本单元产物
 
-- `diagnostics/environment-components.txt` 或等价版本记录；
-- `diagnostics/cuda-smoke-output.txt`；
-- `diagnostics/container-gpu-output.txt` 与 `diagnostics/container-runtime-checks.txt`（已有记录可直接复用）；
+- `$HOME/jetson-stu-day00/environment-components.txt` 与 `tensorrt-python.txt`；
+- `$HOME/jetson-stu-day00/cuda-smoke-output.txt`；
+- `$HOME/jetson-stu-day00/container-runtime.txt` 与 `container-gpu.txt`；
 - 一段说明 JetPack、CUDA、cuDNN、TensorRT 职责的个人笔记。
+
+仓库里的 `diagnostics/` 文件只是课程作者设备的历史示例，不能当作你的环境结果。下面命令会把本次结果保存到 `$HOME/jetson-stu-day00/`，避免把设备信息误提交到 Git。
 
 ## 操作教程
 
@@ -42,50 +44,59 @@ hostname
 
 `whoami` 不应显示 `root`。仓库路径以设备上的实际路径为准；后续命令均从仓库根目录执行。
 
-### 2. 记录 Jetson 软件栈
+### 2. 现场记录 Jetson 软件栈
 
-查看仓库中已有的组件检查记录，并在需要时补充以下实时信息：
-
-```bash
-# 查看已记录的 Jetson 组件版本，并补充当前设备的实时版本信息。
-sed -n '1,160p' diagnostics/environment-components.txt
-cat /etc/nv_tegra_release
-nvcc --version
-python3 --version
-```
-
-然后确认 Python 能导入 TensorRT（如果当前系统已提供绑定）：
+不要先读取仓库里的诊断文件。直接在自己的 Jetson 上采集当前信息，并把原始输出保存到本机：
 
 ```bash
-# 验证当前 Python 是否能加载 TensorRT，并打印绑定版本。
-python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)'
+# 采集本机时间、用户、系统、L4T、CUDA Toolkit、Python 和驱动信息。
+mkdir -p "$HOME/jetson-stu-day00"
+{
+  echo "timestamp=$(date --iso-8601=seconds)"
+  echo "user=$(whoami)"
+  echo "hostname=$(hostname)"
+  echo "kernel=$(uname -a)"
+  cat /etc/nv_tegra_release
+  nvcc --version
+  python3 --version
+  command -v nvidia-smi >/dev/null && nvidia-smi || true
+} 2>&1 | tee "$HOME/jetson-stu-day00/environment-components.txt"
+
+# 单独确认当前 Python 能加载 TensorRT，并记录绑定版本。
+python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)' \
+  | tee "$HOME/jetson-stu-day00/tensorrt-python.txt"
 ```
 
-不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。当前仓库的已验证基线是 JetPack 7.2-b187、L4T R39.2、Ubuntu 24.04 ARM64、CUDA Toolkit 13.2、TensorRT 10.16.2.10；如果设备输出不同，应记录差异，不要静默覆盖环境记录。
+不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。以这次命令输出为准；如果设备输出不同，记录差异，不要套用仓库示例中的版本号。
 
 ### 3. 编译并运行真实 CUDA 计算
 
 烟雾测试会编译 CUDA 源码、执行 kernel、取回结果并进行数值校验：
 
 ```bash
-# 编译 CUDA 烟雾测试，再运行它并把原始输出保存到诊断文件。
-nvcc diagnostics/cuda_smoke.cu -o /tmp/cuda_smoke
-/tmp/cuda_smoke | tee diagnostics/cuda-smoke-output.txt
+# 编译仓库中的 CUDA 烟雾测试，并把本机运行结果保存到用户目录。
+nvcc diagnostics/cuda_smoke.cu -o /tmp/jetson-stu-cuda-smoke
+/tmp/jetson-stu-cuda-smoke | tee "$HOME/jetson-stu-day00/cuda-smoke-output.txt"
 ```
 
 预期输出包含明确的 `PASS` 或数值校验成功结论。如果 `nvcc` 不存在，保留完整报错并停止在这里；不要根据驱动信息推测 Toolkit 已安装。
 
-### 4. 复核既有容器 GPU 证据
+### 4. 现场验证 Docker GPU 运行时
 
-Day 0 已经完成 Docker GPU 容器验证。本单元只检查既有记录：
+不要查看仓库中作者设备的容器记录。先检查当前 Docker 是否注册 NVIDIA runtime，再运行一个 ARM64 基础容器确认 GPU 设备能够传入：
 
 ```bash
-# 查看已保存的 Docker GPU 验证结果，不重复安装容器环境。
-sed -n '1,120p' diagnostics/container-gpu-output.txt
-sed -n '1,120p' diagnostics/container-runtime-checks.txt
+# 查看当前 Docker 的运行时配置。
+docker info --format 'server={{.ServerVersion}} runtimes={{json .Runtimes}} default={{.DefaultRuntime}}' \
+  | tee "$HOME/jetson-stu-day00/container-runtime.txt"
+
+# 使用 ARM64 Ubuntu 容器检查 Jetson GPU 设备节点是否可见。
+docker run --rm --runtime=nvidia --gpus all ubuntu:24.04 \
+  bash -lc 'uname -m; ls -l /dev/nvhost-ctrl-gpu /dev/nvmap 2>/dev/null' \
+  2>&1 | tee "$HOME/jetson-stu-day00/container-gpu.txt"
 ```
 
-如果记录不存在，补做一次最小的 GPU 容器验证并保存输出；不要为了 Day 0 安装 PyTorch、ROS 2、Isaac ROS 或完整 DeepStream 环境。
+如果镜像首次下载耗时较长属于正常现象；如果当前 JetPack 对 `ubuntu:24.04` 的 GPU 运行时有兼容性限制，记录完整报错，并改用 NVIDIA 为当前 JetPack 提供的 ARM64 基础镜像。不要为了 Day 0 安装 PyTorch、ROS 2、Isaac ROS 或完整 DeepStream 环境。
 
 ### 5. 建立实验记录格式
 
@@ -112,9 +123,9 @@ sed -n '1,120p' diagnostics/container-runtime-checks.txt
 
 ## 实践
 
-1. 在普通用户终端进入仓库并记录主机和软件栈。
+1. 在普通用户终端进入仓库并现场记录主机和软件栈。
 2. 编译、运行 CUDA 烟雾测试并保存原始输出。
-3. 复核既有 Docker GPU 验证记录。
+3. 现场验证 Docker GPU 运行时并保存原始输出。
 4. 写下四项组件职责和当前环境与课程的兼容性结论。
 
 ## 产物与验收
