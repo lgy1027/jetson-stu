@@ -8,6 +8,13 @@
 
 如何把一张输入图片稳定地变成一张可检查的输出图片，并让错误输入清楚失败？
 
+## 前置条件与边界
+
+- Day 0 已完成，能够进入 Jetson 上的仓库并恢复终端会话。
+- 当前单元只需要 Python、OpenCV、NumPy 和普通文件系统，不需要 PyTorch、摄像头或 GPU 指标。
+- 所有命令都从仓库根目录执行。示例中的 `~/jetson-stu` 应替换为 Jetson 上的真实仓库路径。
+- `perception/inputs/` 与 `perception/outputs/` 被 Git 忽略；课程保留生成方法和证据，不强制提交生成图片。
+
 ## 你要掌握
 
 - 图片文件必须先被解码为像素数组，才能缩放、标注和保存。
@@ -24,15 +31,14 @@
 4. 保存输出图片；
 5. 在错误输入时清楚地失败，而不是产生空文件或难懂的栈追踪。
 
-## 时间和产物
+## 本单元产物
 
-- 预计：2.5–3.5 小时。
 - 你今天提交/保留：两个输入图、两个输出图、脚本和一段错误输入日志。
 - 成功标准：换一张图仍能运行；给错路径时能解释报错。
 
 ## 操作教程
 
-### 0. 先理解今天的工程问题（10 分钟）
+### 0. 先理解今天的工程问题
 
 一张图片在程序里不是“文件”，而是一个像素数组。程序要先把文件解码为数组，才能缩放、画字、保存。今天我们刻意把每一步写清楚：
 
@@ -42,7 +48,7 @@
 
 后续无论接摄像头、视频、PyTorch 还是 ROS 2，都会保留这条“输入是否有效、输出是否可检查”的边界。
 
-### 1. 进入仓库并只检查今天需要的依赖（10 分钟）
+### 1. 进入仓库并只检查今天需要的依赖
 
 在 Jetson 终端执行。请逐块执行，不要整段粘贴后不看输出。
 
@@ -64,7 +70,7 @@ python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
 
 解释：这不是“环境巡检”。`cv2` 是今天读取、变换和保存图片的唯一运行依赖。
 
-### 2. 生成两张确定的测试图片（20 分钟）
+### 2. 生成两张确定的测试图片
 
 真实图片来源不稳定：有时路径不对、有时颜色空间不同。先用程序生成两张输入图，保证每个人都有相同的起点。
 
@@ -81,7 +87,9 @@ file perception/inputs/wide.png perception/inputs/tall.png
 
 预期：两个文件都应被识别为 `PNG image data`，且一个较宽、一个较高。
 
-### 3. 编写可复现的图片处理程序（60 分钟）
+生成程序还会打印每张图的 shape 和 dtype。预期分别为 `(360, 640, 3)`、`(640, 360, 3)` 和 `uint8`；OpenCV 的 shape 顺序是高、宽、通道，不是宽、高、通道。
+
+### 3. 编写可复现的图片处理程序
 
 创建 `perception/image_pipeline.py`。先读代码，再亲手输入或粘贴；注意参数、错误处理和输出目录各自承担的职责。
 
@@ -95,7 +103,7 @@ file perception/inputs/wide.png perception/inputs/tall.png
 - `cv2.imwrite` 的返回值也要检查；
 - 最外层把可预期的输入错误变成清楚的 `ERROR:` 和退出码 `2`。
 
-### 4. 用两种输入验证它（25 分钟）
+### 4. 用两种输入验证它
 
 先运行宽图：
 
@@ -130,7 +138,7 @@ file perception/outputs/wide_480.png perception/outputs/tall_300.png
 2. 左上角有输入名和尺寸变化；
 3. 两张输出图的尺寸不同，但都保持原比例。
 
-### 5. 故意走一次错误路径（15 分钟）
+### 5. 故意走一次错误路径
 
 工程程序是否可靠，不只看成功路径。运行一个不存在的文件：
 
@@ -154,6 +162,42 @@ exit code: 2
 test ! -e perception/outputs/should-not-exist.png && echo "PASS: no bogus output"
 ```
 
+再区分“文件不存在”和“文件存在但不是图片”：
+
+```bash
+printf 'this is not an image\n' > perception/inputs/not-an-image.png
+python3 perception/image_pipeline.py \
+  perception/inputs/not-an-image.png \
+  perception/outputs/should-also-not-exist.png
+echo "exit code: $?"
+```
+
+预期错误包含 `OpenCV could not decode image`，退出码仍为 `2`。这证明路径检查和解码检查解决的是两个不同问题。
+
+### 6. 保存可复现证据
+
+把成功与失败命令集中保存，不要只截一张终端图：
+
+```bash
+{
+  python3 perception/image_pipeline.py perception/inputs/wide.png perception/outputs/wide_480.png --width 480
+  python3 perception/image_pipeline.py perception/inputs/tall.png perception/outputs/tall_300.png --width 300
+  python3 perception/image_pipeline.py perception/inputs/not-here.png perception/outputs/should-not-exist.png
+} > diagnostics/day01-image-pipeline.txt 2>&1
+```
+
+最后一条命令预期失败，因此整个命令组可能返回非零；证据文件仍应包含前两次成功和最后一次失败。验收时同时查看文件内容和实际输出图。
+
+## 常见问题与诊断顺序
+
+| 现象 | 先检查什么 | 不要直接做什么 |
+|---|---|---|
+| `No module named cv2` | 当前 `python3` 路径与 `python3-opencv` 是否属于同一系统环境 | 不要随机安装 x86 wheel |
+| 文件存在但 `imread` 返回空 | `file <path>`、扩展名是否伪装、文件是否损坏 | 不要删除解码检查 |
+| 输出目录存在但没有图片 | `cv2.imwrite` 返回值、目录权限、磁盘空间 | 不要假设没有异常就是写入成功 |
+| 图片被拉伸 | 新高度是否按原宽高比计算 | 不要硬编码宽高两个值 |
+| 标注文字看不清 | 文字描边、图片尺寸、标注位置 | 不要把可视化当作唯一机器结果 |
+
 ## 实践
 
 按顺序完成，不要跳过错误路径：
@@ -162,6 +206,7 @@ test ! -e perception/outputs/should-not-exist.png && echo "PASS: no bogus output
 2. 用两种不同宽高比的图片运行 `image_pipeline.py`。
 3. 打开两张输出图，人工检查比例与左上角标注。
 4. 用不存在的输入路径运行一次，记录 `ERROR:` 与退出码。
+5. 用存在但不可解码的伪图片再验证一次错误边界。
 
 ## 产物与验收
 
@@ -171,7 +216,13 @@ test ! -e perception/outputs/should-not-exist.png && echo "PASS: no bogus output
 - [ ] `image_pipeline.py` 成功处理两张不同尺寸的图；
 - [ ] 你亲眼检查过两张输出图片；
 - [ ] 不存在的输入文件产生清楚的错误，并以退出码 2 结束；
+- [ ] 存在但不可解码的文件不会产生输出图；
+- [ ] `diagnostics/day01-image-pipeline.txt` 或等价记录包含成功和失败证据；
 - [ ] 你能解释为什么只检查“文件存在”还不够。
+
+## 与后续课程的连接
+
+Day 2 会把这里的单一图片结果拆成人可读 PNG 和机器可读 JSON；Day 5 会把同样的读取、处理、写入和资源释放边界放进视频循环；Day 8 会把这些函数包装进 ROS 2 节点。
 
 ## 复盘
 

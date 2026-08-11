@@ -17,14 +17,22 @@ class ImageClassifier:
     def __init__(self, device: str = "auto") -> None:
         if device == "auto":
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        if device.startswith("cuda") and not torch.cuda.is_available():
+            raise RuntimeError(f"requested {device}, but torch.cuda.is_available() is False")
         self.device = torch.device(device)
         self.weights = MobileNet_V3_Small_Weights.DEFAULT
+        self.model_name = "mobilenet_v3_small"
+        self.weights_name = self.weights.name
         self.preprocess = self.weights.transforms()
         self.categories = self.weights.meta["categories"]
         self.model = mobilenet_v3_small(weights=self.weights).eval().to(self.device)
 
     @torch.inference_mode()
     def predict_bgr(self, frame_bgr: "cv2.typing.MatLike", top_k: int = 3) -> tuple[list[dict], float]:
+        if frame_bgr is None or frame_bgr.size == 0:
+            raise ValueError("cannot classify an empty image")
+        if not 1 <= top_k <= len(self.categories):
+            raise ValueError(f"top_k must be between 1 and {len(self.categories)}")
         image_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         tensor = self.preprocess(Image.fromarray(image_rgb)).unsqueeze(0).to(self.device)
         if self.device.type == "cuda":
@@ -64,23 +72,42 @@ def parse_args():
 
 def main() -> None:
     args = parse_args()
+    if not args.input_dir.is_dir():
+        raise SystemExit(f"input directory does not exist: {args.input_dir}")
+    if args.top_k <= 0:
+        raise SystemExit("--top-k must be greater than zero")
     paths = sorted(path for path in args.input_dir.iterdir() if path.suffix.lower() in {".jpg", ".jpeg", ".png"})
     if not paths:
         raise SystemExit(f"no jpg/jpeg/png files found in {args.input_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     classifier = ImageClassifier(args.device)
-    summary = []
+    records = []
+    skipped = []
     for path in paths:
         frame = cv2.imread(str(path))
         if frame is None:
             print("SKIP unreadable:", path)
+            skipped.append({"input": str(path), "reason": "OpenCV could not decode image"})
             continue
         results, latency_ms = classifier.predict_bgr(frame, args.top_k)
         annotated_path = args.output_dir / f"{path.stem}_annotated.jpg"
-        cv2.imwrite(str(annotated_path), annotate(frame, results, latency_ms))
+        if not cv2.imwrite(str(annotated_path), annotate(frame, results, latency_ms)):
+            raise OSError(f"failed to write annotated image: {annotated_path}")
         record = {"input": str(path), "output": str(annotated_path), "latency_ms": round(latency_ms, 3), "predictions": results}
-        summary.append(record)
+        records.append(record)
         print(path.name, "->", results[0]["label"], f"{latency_ms:.1f} ms")
+    if not records:
+        raise SystemExit("no readable images were processed")
+    summary = {
+        "model": classifier.model_name,
+        "weights": classifier.weights_name,
+        "device": str(classifier.device),
+        "top_k": args.top_k,
+        "processed_count": len(records),
+        "skipped_count": len(skipped),
+        "records": records,
+        "skipped": skipped,
+    }
     (args.output_dir / "results.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("saved:", args.output_dir / "results.json")
 

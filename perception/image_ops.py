@@ -34,6 +34,8 @@ def center_crop(image: np.ndarray, crop_width: int, crop_height: int) -> np.ndar
 
 def bgr_to_normalized_rgb(image: np.ndarray) -> np.ndarray:
     """Convert uint8 BGR data into float32 RGB values in the [0, 1] range."""
+    if image.dtype != np.uint8:
+        raise ValueError(f"expected uint8 BGR image, got {image.dtype}")
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
 
 
@@ -73,9 +75,11 @@ def main() -> None:
     annotated = annotate_detections(cropped, detections)
     output_dir = Path("perception/outputs/day02")
     output_dir.mkdir(parents=True, exist_ok=True)
-    cv2.imwrite(str(output_dir / "wide_annotated.png"), annotated)
+    image_path = output_dir / "wide_annotated.png"
+    if not cv2.imwrite(str(image_path), annotated):
+        raise OSError(f"failed to write output image: {image_path}")
     write_result_json(output_dir / "wide_annotated.json", annotated, {"resize_width": 480, "center_crop": [360, 240]}, detections)
-    print("saved:", output_dir / "wide_annotated.png")
+    print("saved:", image_path)
     print("saved:", output_dir / "wide_annotated.json")
     print("normalized RGB dtype/range:", bgr_to_normalized_rgb(cropped).dtype, "[0, 1]")
 

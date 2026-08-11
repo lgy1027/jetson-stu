@@ -2,7 +2,7 @@
 
 Jetson AGX Thor 与具身智能学习项目。
 
-本项目按照“Day 0 环境就绪 + 6 周、30 个主课日”的学习计划推进，目标是从 Jetson 端侧 AI 部署出发，尽快完成 ROS 2 感知流水线、机械臂运动规划，以及受约束的自然语言任务执行闭环。
+本项目按照“Day 0 环境就绪 + 6 个里程碑、30 个弹性实践单元”的学习计划推进，目标是从 Jetson 端侧 AI 部署出发，完成 ROS 2 感知流水线、三维目标转换、机械臂运动规划，以及受约束的自然语言任务执行闭环。
 
 ## 测试设备
 
@@ -17,7 +17,7 @@ Jetson AGX Thor 与具身智能学习项目。
 
 - [Codex跨设备交接入口](AGENTS.md)
 - [课程入口](docs/README.md)
-- [Day 0 + 30天实践计划](docs/course-plan.md)
+- [Day 0 + 30个实践单元](docs/course-plan.md)
 - [每日课件](docs/course/README.md)
 - [可点击课程工作台](course-app/README.md)
 

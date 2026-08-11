@@ -6,6 +6,13 @@
 
 如何证明 PyTorch 在 GPU 上计算，而不是程序启动了却悄悄回退到 CPU？
 
+## 前置条件与兼容性边界
+
+- Day 0 已证明 CUDA Toolkit 可以编译并执行真实 kernel；今天验证的是 PyTorch 自己是否与当前 CUDA/JetPack 组合兼容。
+- 当前目标环境是 JetPack 7.2、Ubuntu 24.04 ARM64、CUDA 13.2。不要使用写给 JetPack 5/6、Ubuntu x86_64 或另一 Python ABI 的 wheel。
+- 截至本课件本次校对时，NVIDIA 的公开 PyTorch for Jetson 兼容矩阵列出了 JetPack 7.0/7.1 的容器版本，但没有给出可直接套用到 JetPack 7.2 的独立 wheel。版本表变化很快，因此本仓库不固定一个未经目标机验证的下载 URL。
+- 如果目标机已经有 CUDA 可用的 PyTorch，先记录来源并验证，不重复安装。如果没有明确支持 JetPack 7.2 的官方路径，本单元应暂停在安装决策处，不能拿旧版本“试到能 import”为止。
+
 ## 你要掌握
 
 - `torch.cuda.is_available()` 是前置条件，不是完整证据；设备名、张量设备、同步计时和数值比较要一起看。
@@ -18,14 +25,13 @@
 2. 用同一矩阵工作负载得到 CPU 与 GPU 结果，比较最大绝对误差。
 3. 输出 GPU 名称、CUDA runtime、同步后的耗时和加速比。
 
-## 时间和产物
+## 本单元产物
 
-- 预计：3–4 小时；首次安装 PyTorch 时可能更久。
 - 产物：`perception/day03_torch_gpu.py`、一次完整原始输出、计算期间的一小段 `tegrastats` 记录。
 
 ## 操作教程
 
-### 1. 只为今天确认 PyTorch 路径（30–60 分钟）
+### 1. 只为今天确认 PyTorch 路径
 
 先检查有没有可用 PyTorch：
 
@@ -33,9 +39,28 @@
 python3 -c 'import torch; print(torch.__version__, torch.cuda.is_available(), torch.version.cuda)'
 ```
 
-如果导入失败或 CUDA 为 `False`，不要安装 x86/PC 教程里的随机 wheel。记录 JetPack、操作系统、CPU 架构和 Python 版本，查 NVIDIA 针对当前软件栈的官方兼容安装说明后再安装。把实际使用的安装命令和版本写入当天记录；这一步的目标是兼容性，不是“装最新版”。
+同时记录解释器与平台，防止 wheel 的架构和 Python ABI 对不上：
 
-### 2. 阅读并运行矩阵工作负载（45 分钟）
+```bash
+python3 - <<'PY'
+import platform, sys
+print("python:", sys.version)
+print("executable:", sys.executable)
+print("machine:", platform.machine())
+PY
+```
+
+如果导入失败或 CUDA 为 `False`，按以下顺序决策：
+
+1. 查 [NVIDIA PyTorch for Jetson 兼容矩阵](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html)，寻找明确对应当前 JetPack 的版本；
+2. 查 [NVIDIA Jetson PyTorch 安装说明](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)，确认采用 wheel、容器还是其他官方路径；
+3. 核对 Python ABI、ARM64、CUDA 和 cuDNN 要求；
+4. 把候选方案、来源 URL 和选择理由写入 `diagnostics/day03-pytorch-install-decision.md`；
+5. 只有兼容关系明确后才安装并继续。
+
+不要使用 `sudo pip`，也不要把 `--break-system-packages` 当作默认解法。若使用虚拟环境或容器，后面的 Day 4/5 必须继续使用同一个运行环境。
+
+### 2. 阅读并运行矩阵工作负载
 
 完整文件：[展开 `day03_torch_gpu.py`](#course-file:perception/day03_torch_gpu.py)。先找出四处关键证据：同一对 CPU 随机输入被复制到两种设备、`cuda:0`、两次同步、`max_abs_error`。
 
@@ -44,9 +69,9 @@ cd ~/jetson-stu
 python3 perception/day03_torch_gpu.py | tee diagnostics/day03-torch-gpu-output.txt
 ```
 
-预期：输出 `cuda available: True`、GPU 名称、CPU/GPU 耗时与很小的误差。浮点误差不一定为零；如果误差异常大，先停止并检查随机数、dtype 和累加顺序。
+脚本会在计时前执行一次不计时的预热，然后同步 CUDA。预期输出 `cuda available: True`、GPU 名称、CPU/GPU 结果设备、耗时、加速比与很小的误差。浮点误差不一定为零；如果误差异常大，先停止并检查随机数、dtype 和累加顺序。
 
-### 3. 在真实计算期间取一小段资源证据（15 分钟）
+### 3. 在真实计算期间取一小段资源证据
 
 打开第二个 tmux pane，在第一次命令运行的同时执行：
 
@@ -54,18 +79,46 @@ python3 perception/day03_torch_gpu.py | tee diagnostics/day03-torch-gpu-output.t
 tegrastats --interval 1000 | tee diagnostics/day03-tegrastats.log
 ```
 
-采 10 秒后 `Ctrl-c` 停止。你只需确认 GPU/内存活动和负载在计算期有变化；不要将空闲状态的读数当作结论。
+矩阵脚本结束后停止 `tegrastats`。你只需确认 GPU/内存活动和负载在计算期有变化；不要将空闲状态的读数当作结论。如果默认负载结束太快，可提高 `--size` 或 `--repeats`，但必须避免让系统进入不可响应状态。
 
-### 4. 改一个工作负载变量（30 分钟）
+### 4. 改一个工作负载变量
 
-把 `size` 从 `2048` 改为 `1024` 或 `3072`（内存允许时），再次运行。记录：矩阵尺寸、CPU ms、GPU ms、加速比。不要跨两次不同设置直接比较“谁更快”。
+不要修改源码，通过参数只改变矩阵尺寸：
+
+```bash
+python3 perception/day03_torch_gpu.py --size 1024 --repeats 8 \
+  | tee diagnostics/day03-torch-gpu-1024.txt
+python3 perception/day03_torch_gpu.py --size 2048 --repeats 8 \
+  | tee diagnostics/day03-torch-gpu-2048.txt
+```
+
+记录矩阵尺寸、重复次数、CPU ms、GPU ms、加速比和最大误差。规模不同的两次运行用于观察趋势，不用于宣称某个固定加速比。
+
+## 如何解释输出
+
+- `torch.version.cuda` 是该 PyTorch 构建所针对的 CUDA runtime 信息，不等于 `nvcc --version`。
+- `gpu result device: cuda:0` 证明结果张量位于 GPU；配合同步计时和 `tegrastats` 才形成完整证据。
+- 小矩阵可能因为调度开销而不比 CPU 快，这不是 GPU 未工作。
+- 加速比只对当前 dtype、尺寸、重复次数、功耗模式和软件版本成立。
+- Jetson 使用统一物理内存并不意味着 CPU/GPU 张量对象完全没有迁移或同步成本。
+
+## 常见失败与处理
+
+| 现象 | 含义与下一步 |
+|---|---|
+| `import torch` 失败 | 先核对解释器和安装来源，不继续 Day 4 |
+| `cuda available: False` | 当前 PyTorch 没有可用 CUDA 后端；不要偷偷改成 CPU 通过验收 |
+| `no kernel image` / 动态库错误 | 构建与 GPU/CUDA 栈不匹配，保存完整错误并回到兼容性决策 |
+| GPU 时间异常小 | 检查同步是否仍在计时边界两侧 |
+| GPU 时间异常大 | 记录首次运行、功耗模式、温度、后台负载和矩阵规模，再复测 |
+| 系统内存压力过高 | 降低 `--size`；不要先用 Swap 掩盖不合理工作负载 |
 
 ## 实践
 
 1. 留下兼容 PyTorch 版本和 CUDA 可用性证据。
 2. 运行 CPU/GPU 同一矩阵工作负载。
-3. 保存同步后的耗时、最大误差与 10 秒计算期监控片段。
-4. 只改变一个矩阵尺寸后重跑一次。
+3. 保存同步后的耗时、最大误差与计算期监控片段。
+4. 通过 `--size` 只改变一个变量后重跑一次。
 
 ## 产物与验收
 
@@ -73,6 +126,11 @@ tegrastats --interval 1000 | tee diagnostics/day03-tegrastats.log
 - [ ] CPU/GPU 都完成相同工作，`max_abs_error` 合理且可解释。
 - [ ] 两次测试各自有尺寸和耗时记录。
 - [ ] 监控证据来自真实计算期间。
+- [ ] 安装来源或兼容性决策被记录，且没有混用其他 JetPack 的 wheel。
+
+## 与后续课程的连接
+
+Day 4 会继续使用同一个 PyTorch 环境和 CUDA 计时边界；Day 11 会从同一模型导出 ONNX；Day 14 会把这里的单次矩阵实验升级为统一的推理延迟、吞吐和内存基准。
 
 ## 复盘
 

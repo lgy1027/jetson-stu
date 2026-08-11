@@ -4,7 +4,7 @@ This file is the entry point for any Codex instance working in this repository. 
 
 ## What we are doing
 
-The user is transitioning from LLM application engineering into Jetson and embodied-intelligence engineering. This repository tracks a Day 0 environment setup plus 30 practice-day learning program and contains the exercises, diagnostics, benchmarks, ROS 2 packages, robot descriptions, task-planning code, and final portfolio project.
+The user is transitioning from LLM application engineering into Jetson and embodied-intelligence engineering. This repository tracks a Day 0 environment setup plus 30 flexible practice units organized into six evidence-driven milestones. A "Day" is a stable unit number, not a mandatory calendar-day deadline. The repository contains the exercises, diagnostics, benchmarks, ROS 2 packages, robot descriptions, task-planning code, and final portfolio project.
 
 The first-stage capstone is:
 
@@ -12,7 +12,7 @@ The first-stage capstone is:
 natural-language goal
     -> constrained task schema and safety checks
     -> image/video perception on Jetson
-    -> ROS 2 messages and TF transforms
+    -> camera geometry, ROS 2 messages, and TF transforms
     -> simulated robot-arm motion planning
     -> execution result and performance evaluation
 ```
@@ -22,7 +22,7 @@ LLMs/VLMs may perform semantic interpretation, task decomposition, and skill sel
 ## User and available hardware
 
 - User background: professional LLM application developer; already comfortable with Python, deep learning, and model applications.
-- Study time: about 3-4 hours per day.
+- Study cadence: typically 3-4 hours per session, but units may span multiple sessions and have no fixed command-level time estimates.
 - Current hardware: NVIDIA Jetson AGX Thor Developer Kit 128GB (T5000), with no camera, robot arm, mobile base, or other robot hardware yet.
 - Initial direction: use files and simulation first; eventually build toward vision-guided robot-arm manipulation.
 
@@ -45,7 +45,7 @@ Treat this file and the checked-in diagnostics as the current environment record
 - [x] Day 0 completed: system baseline, SSH, CUDA real computation, and Docker GPU container validation.
 - [ ] Day 1 is next: build the first reproducible image-processing program.
 
-Last updated: 2026-08-05.
+Last updated: 2026-08-11.
 
 ## Authoritative documents
 
@@ -54,7 +54,7 @@ Read these in order:
 1. `AGENTS.md` — current handoff and operating rules.
 2. `README.md` — repository overview and visible progress.
 3. `docs/README.md` — course entry point.
-4. `docs/course-plan.md` — authoritative Day 0 + 30-day practice plan.
+4. `docs/course-plan.md` — authoritative Day 0 + 30-unit, six-milestone practice plan.
 5. `docs/course/README.md` — daily lesson index.
 6. The current day's `docs/course/day-NN-*.md` courseware.
 
@@ -68,9 +68,9 @@ If these files disagree, pause and reconcile them rather than silently choosing 
 4. Limit environment checks to those needed to unblock the current implementation; do not repeat already verified checks.
 5. Let the user execute experiments by default. Use remote execution only when explicitly asked.
 6. Execute the session in small batches with explicit verification.
-7. Do not mark a day complete until its acceptance condition has evidence.
+7. Do not mark a unit complete until its acceptance condition has evidence; never advance only because a calendar day ended.
 8. Save commands, logs, versions, measurements, and conclusions in this repository.
-9. At the end of a day, update all three:
+9. At the end of a completed unit, update all three:
    - the course plan's progress;
    - progress in `README.md`;
    - `Current progress`, the next milestone, and `Last updated` in this file.

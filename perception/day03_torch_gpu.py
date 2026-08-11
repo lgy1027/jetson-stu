@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from argparse import ArgumentParser
 import time
 
 import torch
@@ -11,6 +12,7 @@ def timed_matmul(left: torch.Tensor, right: torch.Tensor, device: torch.device, 
     """Time only the math, using the same inputs on CPU and GPU."""
     left = left.to(device)
     right = right.to(device)
+    _ = left @ right  # initialize backend/library work outside the measured region
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     started = time.perf_counter()
@@ -22,8 +24,18 @@ def timed_matmul(left: torch.Tensor, right: torch.Tensor, device: torch.device, 
     return result, (time.perf_counter() - started) * 1000
 
 
+def parse_args():
+    parser = ArgumentParser(description="Compare one deterministic matrix workload on CPU and CUDA")
+    parser.add_argument("--size", type=int, default=2048, help="square matrix dimension")
+    parser.add_argument("--repeats", type=int, default=8, help="number of matrix multiplications")
+    return parser.parse_args()
+
+
 def main() -> None:
-    size, repeats = 2048, 8
+    args = parse_args()
+    if args.size <= 0 or args.repeats <= 0:
+        raise SystemExit("--size and --repeats must be greater than zero")
+    size, repeats = args.size, args.repeats
     print("torch:", torch.__version__)
     print("cuda runtime:", torch.version.cuda)
     print("cuda available:", torch.cuda.is_available())

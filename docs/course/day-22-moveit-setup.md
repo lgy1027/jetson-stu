@@ -1,4 +1,4 @@
-# Day 19：MoveIt 2 仿真配置
+# Day 20：MoveIt 2 仿真配置
 
 ## 今天的问题
 
@@ -11,7 +11,7 @@
 
 ## 实践
 
-1. 为 Day 18 的机械臂创建或导入 MoveIt 配置。
+1. 为 Day 19 的机械臂创建或导入 MoveIt 配置。
 2. 在 RViz 打开 Motion Planning 面板。
 3. 设置规划组与末端 link，检查关节限制是否被读取。
 4. 保存能启动 RViz + MoveIt 的 launch 命令。

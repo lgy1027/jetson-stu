@@ -8,9 +8,9 @@ const courseOrder = [
   { day: 'Day 01', file: 'day-01-image-pipeline.md' }, { day: 'Day 02', file: 'day-02-image-ops.md' }, { day: 'Day 03', file: 'day-03-gpu-tensors.md' }, { day: 'Day 04', file: 'day-04-model-inference.md' }, { day: 'Day 05', file: 'day-05-video-inference.md' },
   'day-13-ros2-workspace.md', 'day-14-ros2-topics.md', 'day-15-perception-node.md', 'day-16-parameters-launch.md', 'day-18-rosbag-integration.md',
   'day-07-onnx-export.md', 'day-08-onnx-runtime.md', 'day-09-tensorrt-build.md', 'day-10-backend-benchmark.md', 'day-12-deployment-review.md',
-  'day-19-coordinate-math.md', 'day-20-tf2.md', 'day-21-urdf.md', 'day-22-moveit-setup.md', 'day-23-motion-planning.md',
-  'day-24-safety-rejection.md', 'day-25-task-schema.md', 'day-26-state-machine.md', 'day-27-perception-to-task.md', 'day-28-end-to-end.md',
-  'day-26-moveit-task-integration.md', 'day-29-failure-cases.md', 'day-28-observability.md', 'day-30-portfolio.md', 'day-30-final-demo.md',
+  'day-19-coordinate-math.md', 'day-17-camera-geometry.md', 'day-20-tf2.md', 'day-21-urdf.md', 'day-22-moveit-setup.md',
+  'day-23-motion-planning.md', 'day-24-safety-rejection.md', 'day-25-task-schema.md', 'day-26-state-machine.md', 'day-27-perception-to-task.md',
+  'day-26-moveit-task-integration.md', 'day-28-end-to-end.md', 'day-29-failure-cases.md', 'day-28-observability.md', 'day-30-final-demo.md',
 ].map((item) => typeof item === 'string' ? { day: null, file: item } : item);
 const courseDir = path.resolve(import.meta.dirname, '../docs/course');
 const repositoryRoot = path.resolve(import.meta.dirname, '..');

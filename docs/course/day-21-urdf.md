@@ -1,4 +1,4 @@
-# Day 18：用 URDF 描述机械臂
+# Day 19：用 URDF/Xacro 描述机械臂
 
 ## 今天的问题
 
