@@ -37,6 +37,7 @@
 优先复用 Day 4 的许可图片生成确定性输入视频。完整文件：[展开 `day05_make_sample_video.py`](#course-file:perception/day05_make_sample_video.py)。
 
 ```bash
+# 创建 Day 5 的目录，并把 Day 4 图片生成确定性输入视频。
 cd ~/jetson-stu
 mkdir -p perception/inputs/day05 perception/outputs/day05
 python3 perception/day05_make_sample_video.py \
@@ -51,6 +52,7 @@ python3 perception/day05_make_sample_video.py \
 也可以把一个许可明确的自有视频放到 `perception/inputs/day05/` 做第二次验证。查看容器信息：
 
 ```bash
+# 查看输入视频的编码、分辨率、FPS 和时长等容器信息。
 ffprobe -hide_banner perception/inputs/day05/day04-slideshow.mp4 2>&1 | head -30
 ```
 
@@ -68,6 +70,7 @@ ffprobe -hide_banner perception/inputs/day05/day04-slideshow.mp4 2>&1 | head -30
 ### 3. 运行最小视频实验
 
 ```bash
+# 对视频逐帧推理，每 5 帧保存一帧结果，并记录 JSON 和日志。
 python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every5.mp4 \
@@ -87,6 +90,7 @@ python3 -m json.tool perception/outputs/day05/annotated-every5.json
 只改变 `--every`，并使用不同输出名避免覆盖第一次证据：
 
 ```bash
+# 改为每帧推理，使用不同输出文件以便和上一次结果比较。
 python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every1.mp4 \
@@ -99,6 +103,7 @@ python3 perception/day05_infer_video.py \
 ### 6. 验证错误和资源边界
 
 ```bash
+# 传入不存在的视频和非法 every 参数，验证输入与参数错误都会失败。
 python3 perception/day05_infer_video.py \
   perception/inputs/day05/not-here.mp4 \
   perception/outputs/day05/invalid.mp4 \

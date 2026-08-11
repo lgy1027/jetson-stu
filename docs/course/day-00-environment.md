@@ -33,6 +33,7 @@
 在 Jetson 的普通开发用户终端执行：
 
 ```bash
+# 进入课程仓库，确认当前用户和实际工作目录。
 cd ~/jetson-stu
 pwd
 whoami
@@ -46,6 +47,7 @@ hostname
 查看仓库中已有的组件检查记录，并在需要时补充以下实时信息：
 
 ```bash
+# 查看已记录的 Jetson 组件版本，并补充当前设备的实时版本信息。
 sed -n '1,160p' diagnostics/environment-components.txt
 cat /etc/nv_tegra_release
 nvcc --version
@@ -55,6 +57,7 @@ python3 --version
 然后确认 Python 能导入 TensorRT（如果当前系统已提供绑定）：
 
 ```bash
+# 验证当前 Python 是否能加载 TensorRT，并打印绑定版本。
 python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)'
 ```
 
@@ -65,6 +68,7 @@ python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)'
 烟雾测试会编译 CUDA 源码、执行 kernel、取回结果并进行数值校验：
 
 ```bash
+# 编译 CUDA 烟雾测试，再运行它并把原始输出保存到诊断文件。
 nvcc diagnostics/cuda_smoke.cu -o /tmp/cuda_smoke
 /tmp/cuda_smoke | tee diagnostics/cuda-smoke-output.txt
 ```
@@ -76,6 +80,7 @@ nvcc diagnostics/cuda_smoke.cu -o /tmp/cuda_smoke
 Day 0 已经完成 Docker GPU 容器验证。本单元只检查既有记录：
 
 ```bash
+# 查看已保存的 Docker GPU 验证结果，不重复安装容器环境。
 sed -n '1,120p' diagnostics/container-gpu-output.txt
 sed -n '1,120p' diagnostics/container-runtime-checks.txt
 ```

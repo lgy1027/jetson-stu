@@ -53,6 +53,7 @@
 在 Jetson 终端执行。请逐块执行，不要整段粘贴后不看输出。
 
 ```bash
+# 进入仓库、创建今天的输入输出目录，并确认 OpenCV 可导入。
 cd ~/jetson-stu
 mkdir -p perception/inputs perception/outputs
 python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
@@ -63,6 +64,7 @@ python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
 如果出现 `ModuleNotFoundError: No module named 'cv2'`，先不要继续；记录完整报错，然后只安装今天需要的包：
 
 ```bash
+# 仅安装今天缺失的 OpenCV 运行依赖，然后再次验证导入。
 sudo apt update
 sudo apt install -y python3-opencv
 python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
@@ -81,6 +83,7 @@ python3 -c 'import cv2; print("OpenCV:", cv2.__version__)'
 运行并检查文件：
 
 ```bash
+# 生成两张尺寸不同但内容确定的测试图片，并检查文件类型。
 python3 perception/make_sample_images.py
 file perception/inputs/wide.png perception/inputs/tall.png
 ```
@@ -108,6 +111,7 @@ file perception/inputs/wide.png perception/inputs/tall.png
 先运行宽图：
 
 ```bash
+# 用宽图验证缩放、标注和输出文件是否正常。
 python3 perception/image_pipeline.py \
   perception/inputs/wide.png \
   perception/outputs/wide_480.png \
@@ -125,6 +129,7 @@ shape: (360, 640, 3) -> (270, 480, 3)
 再用高图验证“不是只为一个尺寸写的程序”：
 
 ```bash
+# 用高图验证程序能保持另一种宽高比，并检查两张结果图。
 python3 perception/image_pipeline.py \
   perception/inputs/tall.png \
   perception/outputs/tall_300.png \
@@ -143,6 +148,7 @@ file perception/outputs/wide_480.png perception/outputs/tall_300.png
 工程程序是否可靠，不只看成功路径。运行一个不存在的文件：
 
 ```bash
+# 传入不存在的输入，验证程序会返回清楚的错误和非零退出码。
 python3 perception/image_pipeline.py \
   perception/inputs/not-here.png \
   perception/outputs/should-not-exist.png

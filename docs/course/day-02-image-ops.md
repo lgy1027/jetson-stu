@@ -48,6 +48,7 @@
 完整文件：[展开 `image_ops.py`](#course-file:perception/image_ops.py)。先看四个函数各自的输入与输出，再运行：
 
 ```bash
+# 运行图像变换程序，检查标注图片和结构化 JSON 输出。
 cd ~/jetson-stu
 python3 perception/image_ops.py
 file perception/outputs/day02/wide_annotated.png
@@ -71,12 +72,14 @@ python3 -m json.tool perception/outputs/day02/wide_annotated.json
 完整文件：[展开 `test_image_ops.py`](#course-file:perception/test_image_ops.py)。运行：
 
 ```bash
+# 执行边界测试，验证裁剪、缩放、颜色转换和错误输入契约。
 python3 -m pytest -q perception/test_image_ops.py
 ```
 
 如果没有 `pytest`，当天只安装这个测试工具。现代 Ubuntu 的系统 Python 通常不允许直接用 pip 改系统环境，因此使用发行版包：
 
 ```bash
+# 仅安装本课需要的 pytest 测试工具，然后重新执行测试。
 sudo apt update
 sudo apt install -y python3-pytest
 python3 -m pytest -q perception/test_image_ops.py
@@ -91,6 +94,7 @@ python3 -m pytest -q perception/test_image_ops.py
 ### 6. 保存本单元证据
 
 ```bash
+# 保存程序、测试和 JSON 校验的原始输出，作为本单元验收证据。
 python3 perception/image_ops.py | tee diagnostics/day02-image-ops.txt
 python3 -m pytest -q perception/test_image_ops.py | tee diagnostics/day02-image-ops-tests.txt
 python3 -m json.tool perception/outputs/day02/wide_annotated.json > /dev/null \

@@ -36,12 +36,14 @@
 先检查有没有可用 PyTorch：
 
 ```bash
+# 检查 PyTorch 版本、CUDA 是否可用，以及它使用的 CUDA 版本。
 python3 -c 'import torch; print(torch.__version__, torch.cuda.is_available(), torch.version.cuda)'
 ```
 
 同时记录解释器与平台，防止 wheel 的架构和 Python ABI 对不上：
 
 ```bash
+# 记录 Python、系统和 CPU 架构，排查 ARM64 与 Python ABI 不匹配。
 python3 - <<'PY'
 import platform, sys
 print("python:", sys.version)
@@ -65,6 +67,7 @@ PY
 完整文件：[展开 `day03_gpu_tensors.py`](#course-file:perception/day03_gpu_tensors.py)。先找出四处关键证据：同一对 CPU 随机输入被复制到两种设备、`cuda:0`、两次同步、`max_abs_error`。
 
 ```bash
+# 从仓库根目录运行 CPU/GPU 张量对照实验，并保存输出。
 cd ~/jetson-stu
 python3 perception/day03_gpu_tensors.py | tee diagnostics/gpu-tensors-output.txt
 ```
@@ -76,6 +79,7 @@ python3 perception/day03_gpu_tensors.py | tee diagnostics/gpu-tensors-output.txt
 打开第二个 tmux pane，在第一次命令运行的同时执行：
 
 ```bash
+# 每秒采样 Jetson 的 GPU、CPU 和内存活动，观察真实计算期间的负载。
 tegrastats --interval 1000 | tee diagnostics/gpu-tensors-tegrastats.log
 ```
 
@@ -86,6 +90,7 @@ tegrastats --interval 1000 | tee diagnostics/gpu-tensors-tegrastats.log
 不要修改源码，通过参数只改变矩阵尺寸：
 
 ```bash
+# 只改变矩阵规模，分别保存两次可比较的性能结果。
 python3 perception/day03_gpu_tensors.py --size 1024 --repeats 8 \
   | tee diagnostics/gpu-tensors-1024.txt
 python3 perception/day03_gpu_tensors.py --size 2048 --repeats 8 \

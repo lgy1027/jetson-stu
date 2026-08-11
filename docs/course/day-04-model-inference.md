@@ -37,6 +37,7 @@
 创建目录并放入至少 10 张你有权使用的 JPG/PNG。来源可为自己拍摄、公开许可素材或你已拥有的数据；在 `source-notes.txt` 记录来源和许可。当前没有相机时，优先使用公开许可、内容多样的静态图片。
 
 ```bash
+# 进入仓库、创建 Day 4 的输入输出目录，并统计当前输入文件数量。
 cd ~/jetson-stu
 mkdir -p perception/inputs/day04 perception/outputs/day04
 find perception/inputs/day04 -type f | wc -l
@@ -47,6 +48,7 @@ find perception/inputs/day04 -type f | wc -l
 为实际输入生成可复现清单：
 
 ```bash
+# 为每个输入文件生成 SHA-256 清单，保证以后复测使用同一批字节。
 find perception/inputs/day04 -maxdepth 1 -type f \
   \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
   -print0 | sort -z | xargs -0 sha256sum \
@@ -58,6 +60,7 @@ find perception/inputs/day04 -maxdepth 1 -type f \
 ### 2. 确认 Python 运行时
 
 ```bash
+# 确认 PyTorch、torchvision、Pillow 版本和 CUDA 可用状态。
 python3 -c 'import torch, torchvision, PIL; print(torch.__version__, torchvision.__version__, torch.cuda.is_available())'
 ```
 
@@ -79,6 +82,7 @@ python3 -c 'import torch, torchvision, PIL; print(torch.__version__, torchvision
 ### 4. 运行并检查批量结果
 
 ```bash
+# 批量执行模型推理，保存标注图片、JSON 结果和终端日志。
 python3 perception/day04_infer_images.py \
   perception/inputs/day04 \
   perception/outputs/day04 \
@@ -92,6 +96,7 @@ python3 -m json.tool perception/outputs/day04/results.json | head -80
 用程序检查结构化契约，而不只是滚动阅读 JSON：
 
 ```bash
+# 读取 JSON 并检查模型、设备和处理数量等结构化字段。
 python3 - <<'PY'
 import json
 from pathlib import Path
@@ -119,6 +124,7 @@ PY
 错误输入也属于教程：
 
 ```bash
+# 传入不存在的目录和非法 top-k，验证两个错误路径都会失败。
 python3 perception/day04_infer_images.py \
   perception/inputs/not-a-directory \
   perception/outputs/day04-invalid \
