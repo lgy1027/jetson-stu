@@ -16,7 +16,7 @@
 
 1. 读取并记录 JetPack、L4T、CUDA、cuDNN 和 TensorRT 的当前版本。
 2. 编译并运行一次 CUDA 烟雾测试，确认数值结果正确。
-3. 在当前设备上验证 Docker GPU 运行时，不把仓库里的历史结果当作自己的证据。
+3. 在当前设备上验证 Docker GPU 运行时，确认容器能够访问 GPU。
 4. 建立后续课程统一使用的实验记录格式。
 
 ## 本单元产物
@@ -26,7 +26,7 @@
 - `$HOME/jetson-stu-day00/container-runtime.txt` 与 `container-gpu.txt`；
 - 一段说明 JetPack、CUDA、cuDNN、TensorRT 职责的个人笔记。
 
-仓库里的 `diagnostics/` 文件只是课程作者设备的历史示例，不能当作你的环境结果。下面命令会把本次结果保存到 `$HOME/jetson-stu-day00/`，避免把设备信息误提交到 Git。
+以下命令会把本次结果保存到 `$HOME/jetson-stu-day00/`。这些记录用于本次学习和后续排查，不需要上传到远端。
 
 ## 操作教程
 
@@ -46,7 +46,7 @@ hostname
 
 ### 2. 现场记录 Jetson 软件栈
 
-不要先读取仓库里的诊断文件。直接在自己的 Jetson 上采集当前信息，并把原始输出保存到本机：
+在当前 Jetson 上采集实时信息，并把原始输出保存到本机：
 
 ```bash
 # 采集本机时间、用户、系统、L4T、CUDA Toolkit、Python 和驱动信息。
@@ -67,7 +67,7 @@ python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)' \
   | tee "$HOME/jetson-stu-day00/tensorrt-python.txt"
 ```
 
-不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。以这次命令输出为准；如果设备输出不同，记录差异，不要套用仓库示例中的版本号。
+不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。不同设备的版本可能不同，以本次命令输出为准。
 
 ### 3. 编译并运行真实 CUDA 计算
 
@@ -83,7 +83,7 @@ nvcc diagnostics/cuda_smoke.cu -o /tmp/jetson-stu-cuda-smoke
 
 ### 4. 现场验证 Docker GPU 运行时
 
-不要查看仓库中作者设备的容器记录。先检查当前 Docker 是否注册 NVIDIA runtime，再运行一个 ARM64 基础容器确认 GPU 设备能够传入：
+先检查当前 Docker 是否注册 NVIDIA runtime，再运行一个 ARM64 基础容器确认 GPU 设备能够传入：
 
 ```bash
 # 查看当前 Docker 的运行时配置。
