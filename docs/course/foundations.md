@@ -53,7 +53,7 @@
 ## Docker 与 Python 环境
 
 - **Docker**：把程序、依赖和启动方式封装成镜像，减少“你的电脑能跑、我的电脑不能跑”。它不是虚拟机，仍然使用宿主机的 Jetson 内核和 GPU 驱动。
-- **NVIDIA Container Runtime**：让 Docker 容器能正确访问 Jetson GPU 的运行时桥梁。Day 0 已验证过 GPU 容器；需要模型运行时再单独使用。
+- **NVIDIA Container Runtime**：让 Docker 容器能正确访问 Jetson GPU 的运行时桥梁。Day 0 会在当前设备上现场验证；需要模型运行时再单独使用。
 - **Python 虚拟环境**：隔离项目依赖，避免为不同实验把系统 Python 混乱地改来改去。一个项目一个环境，依赖写入可复现的清单。
 
 现在不需要因为“以后可能会用”而安装 PyTorch、CUDA Toolkit、ROS 包或 Isaac ROS。先完成当前课程的最小闭环；每次安装都要回答：它服务于哪个实践目标，兼容哪个 JetPack/ARM64 组合。

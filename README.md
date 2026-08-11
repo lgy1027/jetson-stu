@@ -6,14 +6,9 @@
 
 线上课程：[lgy1027.github.io/jetson-stu](https://lgy1027.github.io/jetson-stu/)
 
-## 测试设备
+## 运行平台
 
-- NVIDIA Jetson AGX Thor Developer Kit 128GB（T5000）
-- JetPack 7.2 / Jetson Linux 39.2
-- Ubuntu 24.04 ARM64
-- 1TB NVMe SSD
-
-课程会在需要时记录具体软件版本和兼容性要求；学习者应以自己 Jetson 上的现场检查结果为准。
+课程以 NVIDIA Jetson（优先覆盖 Orin / Thor 等新平台）为主要实践环境。具体 JetPack、Ubuntu、CUDA、TensorRT 和存储配置，以学习者在自己的设备上现场检查的结果为准。
 
 ## 学习文档
 
