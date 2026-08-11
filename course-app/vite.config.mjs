@@ -4,14 +4,14 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 const courseOrder = [
-  { day: 'Day 00', file: 'day-00-environment.md' },
-  { day: 'Day 01', file: 'day-01-image-pipeline.md' }, { day: 'Day 02', file: 'day-02-image-ops.md' }, { day: 'Day 03', file: 'day-03-gpu-tensors.md' }, { day: 'Day 04', file: 'day-04-model-inference.md' }, { day: 'Day 05', file: 'day-05-video-inference.md' },
-  'day-13-ros2-workspace.md', 'day-14-ros2-topics.md', 'day-15-perception-node.md', 'day-16-parameters-launch.md', 'day-18-rosbag-integration.md',
-  'day-07-onnx-export.md', 'day-08-onnx-runtime.md', 'day-09-tensorrt-build.md', 'day-10-backend-benchmark.md', 'day-12-deployment-review.md',
-  'day-19-coordinate-math.md', 'day-17-camera-geometry.md', 'day-20-tf2.md', 'day-21-urdf.md', 'day-22-moveit-setup.md',
-  'day-23-motion-planning.md', 'day-24-safety-rejection.md', 'day-25-task-schema.md', 'day-26-state-machine.md', 'day-27-perception-to-task.md',
-  'day-26-moveit-task-integration.md', 'day-28-end-to-end.md', 'day-29-failure-cases.md', 'day-28-observability.md', 'day-30-final-demo.md',
-].map((item) => typeof item === 'string' ? { day: null, file: item } : item);
+  { day: 'Day 0', file: 'day-00-environment.md' },
+  { day: 'Day 1', file: 'day-01-image-pipeline.md' }, { day: 'Day 2', file: 'day-02-image-ops.md' }, { day: 'Day 3', file: 'day-03-gpu-tensors.md' }, { day: 'Day 4', file: 'day-04-model-inference.md' }, { day: 'Day 5', file: 'day-05-video-inference.md' },
+  { day: 'Day 6', file: 'day-06-ros2-workspace.md' }, { day: 'Day 7', file: 'day-07-ros2-topics.md' }, { day: 'Day 8', file: 'day-08-perception-node.md' }, { day: 'Day 9', file: 'day-09-parameters-launch.md' }, { day: 'Day 10', file: 'day-10-rosbag-integration.md' },
+  { day: 'Day 11', file: 'day-11-onnx-export.md' }, { day: 'Day 12', file: 'day-12-onnx-runtime.md' }, { day: 'Day 13', file: 'day-13-tensorrt-build.md' }, { day: 'Day 14', file: 'day-14-backend-benchmark.md' }, { day: 'Day 15', file: 'day-15-deployment-review.md' },
+  { day: 'Day 16', file: 'day-16-coordinate-math.md' }, { day: 'Day 17', file: 'day-17-camera-geometry.md' }, { day: 'Day 18', file: 'day-18-tf2.md' }, { day: 'Day 19', file: 'day-19-urdf.md' }, { day: 'Day 20', file: 'day-20-moveit-setup.md' },
+  { day: 'Day 21', file: 'day-21-motion-planning.md' }, { day: 'Day 22', file: 'day-22-safety-rejection.md' }, { day: 'Day 23', file: 'day-23-task-schema.md' }, { day: 'Day 24', file: 'day-24-state-machine.md' }, { day: 'Day 25', file: 'day-25-perception-to-task.md' },
+  { day: 'Day 26', file: 'day-26-moveit-task-integration.md' }, { day: 'Day 27', file: 'day-27-end-to-end.md' }, { day: 'Day 28', file: 'day-28-failure-cases.md' }, { day: 'Day 29', file: 'day-29-observability.md' }, { day: 'Day 30', file: 'day-30-final-demo.md' },
+];
 const courseDir = path.resolve(import.meta.dirname, '../docs/course');
 const repositoryRoot = path.resolve(import.meta.dirname, '..');
 const virtualCoursewareId = 'virtual:jetson-courseware';
@@ -52,7 +52,7 @@ function parseCourseware({ file, day }, index) {
   const reflection = clean(section(markdown, '复盘'));
   const tutorialMarkdown = afterHeading(markdown, '操作教程');
   return {
-    day: day || `Day ${String(index).padStart(2, '0')}`,
+    day: day || `Day ${index}`,
     title, question, concepts, practice: practice.length ? practice : guidedSteps, outcomes, checks, reflection, source: file,
     markdown: markdown.replace(/^#\s+.+$/m, '').trim(), tutorialMarkdown,
   };

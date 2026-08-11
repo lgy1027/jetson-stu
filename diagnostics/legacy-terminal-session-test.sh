@@ -2,7 +2,7 @@
 set -u
 
 output_dir="$HOME/jetson-stu/diagnostics"
-output_file="$output_dir/day02-tmux-output.log"
+output_file="$output_dir/legacy-terminal-session-output.log"
 
 mkdir -p "$output_dir"
 : >"$output_file"

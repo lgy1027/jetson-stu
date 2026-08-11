@@ -27,7 +27,7 @@
 
 ## 本单元产物
 
-- 产物：`perception/day03_torch_gpu.py`、一次完整原始输出、计算期间的一小段 `tegrastats` 记录。
+- 产物：`perception/day03_gpu_tensors.py`、一次完整原始输出、计算期间的一小段 `tegrastats` 记录。
 
 ## 操作教程
 
@@ -62,11 +62,11 @@ PY
 
 ### 2. 阅读并运行矩阵工作负载
 
-完整文件：[展开 `day03_torch_gpu.py`](#course-file:perception/day03_torch_gpu.py)。先找出四处关键证据：同一对 CPU 随机输入被复制到两种设备、`cuda:0`、两次同步、`max_abs_error`。
+完整文件：[展开 `day03_gpu_tensors.py`](#course-file:perception/day03_gpu_tensors.py)。先找出四处关键证据：同一对 CPU 随机输入被复制到两种设备、`cuda:0`、两次同步、`max_abs_error`。
 
 ```bash
 cd ~/jetson-stu
-python3 perception/day03_torch_gpu.py | tee diagnostics/day03-torch-gpu-output.txt
+python3 perception/day03_gpu_tensors.py | tee diagnostics/gpu-tensors-output.txt
 ```
 
 脚本会在计时前执行一次不计时的预热，然后同步 CUDA。预期输出 `cuda available: True`、GPU 名称、CPU/GPU 结果设备、耗时、加速比与很小的误差。浮点误差不一定为零；如果误差异常大，先停止并检查随机数、dtype 和累加顺序。
@@ -76,7 +76,7 @@ python3 perception/day03_torch_gpu.py | tee diagnostics/day03-torch-gpu-output.t
 打开第二个 tmux pane，在第一次命令运行的同时执行：
 
 ```bash
-tegrastats --interval 1000 | tee diagnostics/day03-tegrastats.log
+tegrastats --interval 1000 | tee diagnostics/gpu-tensors-tegrastats.log
 ```
 
 矩阵脚本结束后停止 `tegrastats`。你只需确认 GPU/内存活动和负载在计算期有变化；不要将空闲状态的读数当作结论。如果默认负载结束太快，可提高 `--size` 或 `--repeats`，但必须避免让系统进入不可响应状态。
@@ -86,10 +86,10 @@ tegrastats --interval 1000 | tee diagnostics/day03-tegrastats.log
 不要修改源码，通过参数只改变矩阵尺寸：
 
 ```bash
-python3 perception/day03_torch_gpu.py --size 1024 --repeats 8 \
-  | tee diagnostics/day03-torch-gpu-1024.txt
-python3 perception/day03_torch_gpu.py --size 2048 --repeats 8 \
-  | tee diagnostics/day03-torch-gpu-2048.txt
+python3 perception/day03_gpu_tensors.py --size 1024 --repeats 8 \
+  | tee diagnostics/gpu-tensors-1024.txt
+python3 perception/day03_gpu_tensors.py --size 2048 --repeats 8 \
+  | tee diagnostics/gpu-tensors-2048.txt
 ```
 
 记录矩阵尺寸、重复次数、CPU ms、GPU ms、加速比和最大误差。规模不同的两次运行用于观察趋势，不用于宣称某个固定加速比。

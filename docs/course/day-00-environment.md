@@ -21,9 +21,9 @@
 
 ## 本单元产物
 
-- `diagnostics/day03-component-checks.txt` 或等价版本记录；
-- `diagnostics/day03-cuda-smoke-output.txt`；
-- `diagnostics/day04-container-gpu-output.txt` 与 `diagnostics/day04-docker-runtime-checks.txt`（已有记录可直接复用）；
+- `diagnostics/environment-components.txt` 或等价版本记录；
+- `diagnostics/cuda-smoke-output.txt`；
+- `diagnostics/container-gpu-output.txt` 与 `diagnostics/container-runtime-checks.txt`（已有记录可直接复用）；
 - 一段说明 JetPack、CUDA、cuDNN、TensorRT 职责的个人笔记。
 
 ## 操作教程
@@ -46,7 +46,7 @@ hostname
 查看仓库中已有的组件检查记录，并在需要时补充以下实时信息：
 
 ```bash
-sed -n '1,160p' diagnostics/day03-component-checks.txt
+sed -n '1,160p' diagnostics/environment-components.txt
 cat /etc/nv_tegra_release
 nvcc --version
 python3 --version
@@ -65,8 +65,8 @@ python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)'
 烟雾测试会编译 CUDA 源码、执行 kernel、取回结果并进行数值校验：
 
 ```bash
-nvcc diagnostics/day03_cuda_smoke.cu -o /tmp/day03_cuda_smoke
-/tmp/day03_cuda_smoke | tee diagnostics/day03-cuda-smoke-output.txt
+nvcc diagnostics/cuda_smoke.cu -o /tmp/cuda_smoke
+/tmp/cuda_smoke | tee diagnostics/cuda-smoke-output.txt
 ```
 
 预期输出包含明确的 `PASS` 或数值校验成功结论。如果 `nvcc` 不存在，保留完整报错并停止在这里；不要根据驱动信息推测 Toolkit 已安装。
@@ -76,8 +76,8 @@ nvcc diagnostics/day03_cuda_smoke.cu -o /tmp/day03_cuda_smoke
 Day 0 已经完成 Docker GPU 容器验证。本单元只检查既有记录：
 
 ```bash
-sed -n '1,120p' diagnostics/day04-container-gpu-output.txt
-sed -n '1,120p' diagnostics/day04-docker-runtime-checks.txt
+sed -n '1,120p' diagnostics/container-gpu-output.txt
+sed -n '1,120p' diagnostics/container-runtime-checks.txt
 ```
 
 如果记录不存在，补做一次最小的 GPU 容器验证并保存输出；不要为了 Day 0 安装 PyTorch、ROS 2、Isaac ROS 或完整 DeepStream 环境。

@@ -11,16 +11,16 @@ const contactQrImage = `${import.meta.env.BASE_URL}assets/contact-wechat-qr.jpg`
 const weeks = [
   {
     name: 'Start', subtitle: '环境与工作流', color: 'lime',
-    days: [['Day 00', '环境与工作流', '建立可复现的 Jetson 开发方式']],
+    days: [['Day 0', '环境与工作流', '建立可复现的 Jetson 开发方式']],
   },
   {
     name: 'M1', subtitle: '可复现感知程序', color: 'lime',
     days: [
-      ['Day 01', '图像进入 Jetson', '建立可复现的图像输入与输出'],
-      ['Day 02', '图像操作实验室', '用 NumPy / OpenCV 看懂图像数据'],
-      ['Day 03', 'GPU 张量与统一内存', '把同一任务放到 CPU 与 GPU 对比'],
-      ['Day 04', '第一个视觉模型', '完成一次可解释的推理'],
-      ['Day 05', '视频流推理', '让推理进入连续帧循环'],
+      ['Day 1', '图像进入 Jetson', '建立可复现的图像输入与输出'],
+      ['Day 2', '图像操作实验室', '用 NumPy / OpenCV 看懂图像数据'],
+      ['Day 3', 'GPU 张量与统一内存', '把同一任务放到 CPU 与 GPU 对比'],
+      ['Day 4', '第一个视觉模型', '完成一次可解释的推理'],
+      ['Day 5', '视频流推理', '让推理进入连续帧循环'],
     ],
   },
   {
@@ -118,7 +118,7 @@ function SourceDialog({ path, source, onClose }) {
 }
 
 export function App() {
-  const [activeDay, setActiveDay] = useState('Day 01');
+  const [activeDay, setActiveDay] = useState('Day 1');
   const [activeTab, setActiveTab] = useState('lesson');
   const [openWeek, setOpenWeek] = useState(1);
   const [viewingFoundations, setViewingFoundations] = useState(false);
@@ -127,7 +127,7 @@ export function App() {
   const lesson = lessons.find((item) => item.day === activeDay) || lessons[0];
   const lessonIndex = lessons.findIndex((item) => item.day === activeDay);
   const completed = useMemo(() => new Set(done), [done]);
-  const completedMainDays = done.filter((day) => day !== 'Day 00').length;
+  const completedMainDays = done.filter((day) => day !== 'Day 0').length;
 
   useEffect(() => localStorage.setItem('jetson-course-done', JSON.stringify(done)), [done]);
   useEffect(() => {
@@ -193,7 +193,7 @@ export function App() {
             <h1>Jetson 概念地图</h1>
             <p className="lesson-goal"><Compass size={20} weight="fill" /> 先建立共同语言，再开始环境与实践。</p>
             <article className="content-card markdown-lesson foundations-lesson"><CourseMarkdown onOpenCode={setExpandedCode}>{foundationsMarkdown}</CourseMarkdown></article>
-            <footer className="lesson-footer"><button onClick={() => chooseDay('Day 00', 0)}>进入 Day 0 →</button><span>这页不计入 30 个单元进度，但建议每位新同学先读完。</span><span /></footer>
+            <footer className="lesson-footer"><button onClick={() => chooseDay('Day 0', 0)}>进入 Day 0 →</button><span>这页不计入 30 个单元进度，但建议每位新同学先读完。</span><span /></footer>
           </> : <>
           <div className="lesson-topline"><span className={`status-pill ${lesson.week.color}`}>{lesson.week.name} · {lesson.day}</span><span><Clock size={16} /> {lesson.pace}</span></div>
           <h1>{lesson.title}</h1>

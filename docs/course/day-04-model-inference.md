@@ -28,7 +28,7 @@
 ## 本单元产物
 
 - 前置：Day 3 的 GPU PyTorch 可用；还需要匹配的 `torchvision` 与 Pillow。
-- 产物：`perception/infer_images.py`、至少 10 张输入图、对应标注图和 `results.json`。
+- 产物：`perception/day04_infer_images.py`、至少 10 张输入图、对应标注图和 `results.json`。
 
 ## 操作教程
 
@@ -67,7 +67,7 @@ python3 -c 'import torch, torchvision, PIL; print(torch.__version__, torchvision
 
 ### 3. 阅读批量推理程序
 
-完整文件：[展开 `infer_images.py`](#course-file:perception/infer_images.py)。重点找到：
+完整文件：[展开 `day04_infer_images.py`](#course-file:perception/day04_infer_images.py)。重点找到：
 
 - `weights.transforms()`：权重附带的预处理契约；
 - `torch.inference_mode()`：推理时关闭梯度记录；
@@ -79,11 +79,11 @@ python3 -c 'import torch, torchvision, PIL; print(torch.__version__, torchvision
 ### 4. 运行并检查批量结果
 
 ```bash
-python3 perception/infer_images.py \
+python3 perception/day04_infer_images.py \
   perception/inputs/day04 \
   perception/outputs/day04 \
   --device cuda:0 \
-  --top-k 3 | tee diagnostics/day04-infer-images-output.txt
+  --top-k 3 | tee diagnostics/day04-image-inference-output.txt
 python3 -m json.tool perception/outputs/day04/results.json | head -80
 ```
 
@@ -119,13 +119,13 @@ PY
 错误输入也属于教程：
 
 ```bash
-python3 perception/infer_images.py \
+python3 perception/day04_infer_images.py \
   perception/inputs/not-a-directory \
   perception/outputs/day04-invalid \
   --device cuda:0
 echo "exit code: $?"
 
-python3 perception/infer_images.py \
+python3 perception/day04_infer_images.py \
   perception/inputs/day04 \
   perception/outputs/day04-invalid-topk \
   --device cuda:0 \

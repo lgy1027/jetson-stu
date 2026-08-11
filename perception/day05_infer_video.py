@@ -9,7 +9,7 @@ import time
 
 import cv2
 
-from perception.infer_images import ImageClassifier, annotate
+from perception.day04_infer_images import ImageClassifier, annotate
 
 
 def parse_args():

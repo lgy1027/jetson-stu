@@ -28,18 +28,18 @@
 ## 本单元产物
 
 - 前置：Day 4 模型能运行；一个你有权使用的短视频。没有摄像头不影响本课。
-- 产物：`perception/infer_video.py`、标注 MP4、同名 JSON 与一次播放检查记录。
+- 产物：`perception/day05_infer_video.py`、标注 MP4、同名 JSON 与一次播放检查记录。
 
 ## 操作教程
 
 ### 1. 准备可复现输入
 
-优先复用 Day 4 的许可图片生成确定性输入视频。完整文件：[展开 `make_sample_video.py`](#course-file:perception/make_sample_video.py)。
+优先复用 Day 4 的许可图片生成确定性输入视频。完整文件：[展开 `day05_make_sample_video.py`](#course-file:perception/day05_make_sample_video.py)。
 
 ```bash
 cd ~/jetson-stu
 mkdir -p perception/inputs/day05 perception/outputs/day05
-python3 perception/make_sample_video.py \
+python3 perception/day05_make_sample_video.py \
   perception/inputs/day04 \
   perception/inputs/day05/day04-slideshow.mp4 \
   --fps 10 \
@@ -58,7 +58,7 @@ ffprobe -hide_banner perception/inputs/day05/day04-slideshow.mp4 2>&1 | head -30
 
 ### 2. 阅读视频循环
 
-完整文件：[展开 `infer_video.py`](#course-file:perception/infer_video.py)。关注四点：
+完整文件：[展开 `day05_infer_video.py`](#course-file:perception/day05_infer_video.py)。关注四点：
 
 1. `--every 5` 意味着每 5 帧做一次推理，其他帧复用最新预测；
 2. writer 使用原始 FPS 和尺寸，以保证播放器可正确解码；
@@ -68,11 +68,11 @@ ffprobe -hide_banner perception/inputs/day05/day04-slideshow.mp4 2>&1 | head -30
 ### 3. 运行最小视频实验
 
 ```bash
-python3 perception/infer_video.py \
+python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every5.mp4 \
   --device cuda:0 \
-  --every 5 | tee diagnostics/day05-video-output.txt
+  --every 5 | tee diagnostics/day05-video-inference-output.txt
 python3 -m json.tool perception/outputs/day05/annotated-every5.json
 ```
 
@@ -87,11 +87,11 @@ python3 -m json.tool perception/outputs/day05/annotated-every5.json
 只改变 `--every`，并使用不同输出名避免覆盖第一次证据：
 
 ```bash
-python3 perception/infer_video.py \
+python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/annotated-every1.mp4 \
   --device cuda:0 --every 1 \
-  | tee diagnostics/day05-video-every1.txt
+  | tee diagnostics/day05-video-every1-output.txt
 ```
 
 比较 `annotated-every1.json` 与 `annotated-every5.json` 中的推理次数、平均推理延迟、wall time 和端到端 FPS，并解释画面标签更新频率为何不同。输入视频、模型、权重和设备必须保持不变。
@@ -99,13 +99,13 @@ python3 perception/infer_video.py \
 ### 6. 验证错误和资源边界
 
 ```bash
-python3 perception/infer_video.py \
+python3 perception/day05_infer_video.py \
   perception/inputs/day05/not-here.mp4 \
   perception/outputs/day05/invalid.mp4 \
   --device cuda:0
 echo "exit code: $?"
 
-python3 perception/infer_video.py \
+python3 perception/day05_infer_video.py \
   perception/inputs/day05/day04-slideshow.mp4 \
   perception/outputs/day05/invalid-every.mp4 \
   --device cuda:0 --every 0
