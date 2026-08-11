@@ -29,7 +29,7 @@ jetson-stu/
 ├── README.md             # 项目入口
 ├── docs/                 # 学习计划、笔记和报告
 ├── course-app/           # 可点击的课程、目标、教程和验收工作台
-├── diagnostics/          # CUDA、容器和环境检查工具
+├── diagnostics/          # CUDA、容器和环境检查工具及本地实验记录
 ├── benchmarks/           # 延迟、吞吐、温度和功耗数据
 ├── perception/           # OpenCV、PyTorch、ONNX 和 TensorRT 实验
 ├── ros2_ws/src/          # ROS 2 packages

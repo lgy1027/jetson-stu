@@ -40,3 +40,6 @@ perception/outputs/
 !.env.example
 *.pem
 *.key
+
+# Per-device Day 0 evidence (may contain hostnames, versions, and runtime details)
+diagnostics/day00/

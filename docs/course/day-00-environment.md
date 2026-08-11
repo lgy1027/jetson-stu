@@ -21,12 +21,12 @@
 
 ## 本单元产物
 
-- `$HOME/jetson-stu-day00/environment-components.txt` 与 `tensorrt-python.txt`；
-- `$HOME/jetson-stu-day00/cuda-smoke-output.txt`；
-- `$HOME/jetson-stu-day00/container-runtime.txt` 与 `container-gpu.txt`；
+- `diagnostics/day00/environment-components.txt` 与 `tensorrt-python.txt`；
+- `diagnostics/day00/cuda-smoke-output.txt`；
+- `diagnostics/day00/container-runtime.txt` 与 `container-gpu.txt`；
 - 一段说明 JetPack、CUDA、cuDNN、TensorRT 职责的个人笔记。
 
-以下命令会把本次结果保存到 `$HOME/jetson-stu-day00/`。这些记录用于本次学习和后续排查，不需要上传到远端。
+以下命令会把本次结果保存到仓库的 `diagnostics/day00/`。这些记录用于本次学习和后续排查；如果其中包含设备信息，请不要上传到公开仓库。
 
 ## 操作教程
 
@@ -49,8 +49,8 @@ hostname
 在当前 Jetson 上采集实时信息，并把原始输出保存到本机：
 
 ```bash
-# 采集本机时间、用户、系统、L4T、CUDA Toolkit、Python 和驱动信息。
-mkdir -p "$HOME/jetson-stu-day00"
+# 先创建 Day 0 的本地证据目录，再采集系统、L4T、CUDA Toolkit、Python 和驱动信息。
+mkdir -p diagnostics/day00
 {
   echo "timestamp=$(date --iso-8601=seconds)"
   echo "user=$(whoami)"
@@ -60,11 +60,11 @@ mkdir -p "$HOME/jetson-stu-day00"
   nvcc --version
   python3 --version
   command -v nvidia-smi >/dev/null && nvidia-smi || true
-} 2>&1 | tee "$HOME/jetson-stu-day00/environment-components.txt"
+} 2>&1 | tee diagnostics/day00/environment-components.txt
 
 # 单独确认当前 Python 能加载 TensorRT，并记录绑定版本。
 python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)' \
-  | tee "$HOME/jetson-stu-day00/tensorrt-python.txt"
+  | tee diagnostics/day00/tensorrt-python.txt
 ```
 
 不要把 `nvidia-smi` 显示的 CUDA 版本当作 Toolkit 已安装的证明。不同设备的版本可能不同，以本次命令输出为准。
@@ -74,9 +74,9 @@ python3 -c 'import tensorrt as trt; print("TensorRT:", trt.__version__)' \
 烟雾测试会编译 CUDA 源码、执行 kernel、取回结果并进行数值校验：
 
 ```bash
-# 编译仓库中的 CUDA 烟雾测试，并把本机运行结果保存到用户目录。
+# 编译仓库中的 CUDA 烟雾测试，并把本机运行结果保存到 Day 0 证据目录。
 nvcc diagnostics/cuda_smoke.cu -o /tmp/jetson-stu-cuda-smoke
-/tmp/jetson-stu-cuda-smoke | tee "$HOME/jetson-stu-day00/cuda-smoke-output.txt"
+/tmp/jetson-stu-cuda-smoke | tee diagnostics/day00/cuda-smoke-output.txt
 ```
 
 预期输出包含明确的 `PASS` 或数值校验成功结论。如果 `nvcc` 不存在，保留完整报错并停止在这里；不要根据驱动信息推测 Toolkit 已安装。
@@ -88,12 +88,12 @@ nvcc diagnostics/cuda_smoke.cu -o /tmp/jetson-stu-cuda-smoke
 ```bash
 # 查看当前 Docker 的运行时配置。
 docker info --format 'server={{.ServerVersion}} runtimes={{json .Runtimes}} default={{.DefaultRuntime}}' \
-  | tee "$HOME/jetson-stu-day00/container-runtime.txt"
+  | tee diagnostics/day00/container-runtime.txt
 
 # 使用 ARM64 Ubuntu 容器检查 Jetson GPU 设备节点是否可见。
 docker run --rm --runtime=nvidia --gpus all ubuntu:24.04 \
   bash -lc 'uname -m; ls -l /dev/nvhost-ctrl-gpu /dev/nvmap 2>/dev/null' \
-  2>&1 | tee "$HOME/jetson-stu-day00/container-gpu.txt"
+  2>&1 | tee diagnostics/day00/container-gpu.txt
 ```
 
 如果镜像首次下载耗时较长属于正常现象；如果当前 JetPack 对 `ubuntu:24.04` 的 GPU 运行时有兼容性限制，记录完整报错，并改用 NVIDIA 为当前 JetPack 提供的 ARM64 基础镜像。不要为了 Day 0 安装 PyTorch、ROS 2、Isaac ROS 或完整 DeepStream 环境。

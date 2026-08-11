@@ -119,10 +119,10 @@ function SourceDialog({ path, source, onClose }) {
 }
 
 export function App() {
-  const [activeDay, setActiveDay] = useState('Day 1');
+  const [activeDay, setActiveDay] = useState('Day 0');
   const [activeTab, setActiveTab] = useState('lesson');
-  const [openWeek, setOpenWeek] = useState(1);
-  const [viewingFoundations, setViewingFoundations] = useState(false);
+  const [openWeek, setOpenWeek] = useState(-1);
+  const [viewingFoundations, setViewingFoundations] = useState(true);
   const [expandedCode, setExpandedCode] = useState(null);
   const [done, setDone] = useState(() => JSON.parse(localStorage.getItem('jetson-course-done') || '[]'));
   const lesson = lessons.find((item) => item.day === activeDay) || lessons[0];
