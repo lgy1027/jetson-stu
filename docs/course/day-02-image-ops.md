@@ -65,7 +65,7 @@ python3 -m json.tool perception/outputs/day02/wide_annotated.json
 2. `bbox_xyxy` 的四个数分别代表什么？
 3. 为什么 `score` 是机器可读的数值，而不是画在图片上的文字？
 
-然后把 `image_ops.py` 的 `detections` 中 `score` 改为 `0.42`，再运行一次。确认图片文字和 JSON 都变了，理解它们来自同一份结构化数据。完成观察后可以改回 `0.87`，避免后续同学误以为这是模型输出。
+然后把 `image_ops.py` 的 `detections` 中 `score` 改为 `0.42`，再运行一次。确认图片文字和 JSON 都变了，理解它们来自同一份结构化数据。观察完成后将值改回 `0.87`，保持示例源码与预期输出一致。
 
 ### 4. 运行边界测试
 

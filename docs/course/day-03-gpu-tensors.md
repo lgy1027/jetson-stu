@@ -9,9 +9,9 @@
 ## 前置条件与兼容性边界
 
 - Day 0 已证明 CUDA Toolkit 可以编译并执行真实 kernel；今天验证的是 PyTorch 自己是否与当前 CUDA/JetPack 组合兼容。
-- 当前目标环境是 JetPack 7.2、Ubuntu 24.04 ARM64、CUDA 13.2。不要使用写给 JetPack 5/6、Ubuntu x86_64 或另一 Python ABI 的 wheel。
-- 截至本课件本次校对时，NVIDIA 的公开 PyTorch for Jetson 兼容矩阵列出了 JetPack 7.0/7.1 的容器版本，但没有给出可直接套用到 JetPack 7.2 的独立 wheel。版本表变化很快，因此本仓库不固定一个未经目标机验证的下载 URL。
-- 如果目标机已经有 CUDA 可用的 PyTorch，先记录来源并验证，不重复安装。如果没有明确支持 JetPack 7.2 的官方路径，本单元应暂停在安装决策处，不能拿旧版本“试到能 import”为止。
+- PyTorch 必须同时匹配 JetPack、CUDA、ARM64 架构和 Python ABI。不要使用为其他 JetPack、x86_64 或其他 Python 版本构建的 wheel。
+- 安装前先查阅 [NVIDIA PyTorch for Jetson 兼容矩阵](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html) 和 [Jetson PyTorch 安装说明](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)，确认当前设备有明确支持的安装路径。
+- 如果设备已有 CUDA 可用的 PyTorch，先记录来源并验证；如果没有明确兼容路径，暂停安装并记录原因，不要用未经验证的旧版本反复尝试。
 
 ## 你要掌握
 

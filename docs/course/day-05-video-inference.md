@@ -56,7 +56,7 @@ python3 perception/day05_make_sample_video.py \
 ffprobe -hide_banner perception/inputs/day05/day04-slideshow.mp4 2>&1 | head -30
 ```
 
-如果没有 `ffprobe`，不必为了本课安装完整 FFmpeg；使用 OpenCV 稍后写入 JSON 的 FPS、帧数和时长。处理自有素材时先选短片，不要直接使用大型视频。
+如果没有 `ffprobe`，不必为了本课安装完整 FFmpeg；推理脚本会使用 OpenCV 记录 JSON 中的 FPS、帧数和时长。处理自有素材时先选短片，不要直接使用大型视频。
 
 ### 2. 阅读视频循环
 

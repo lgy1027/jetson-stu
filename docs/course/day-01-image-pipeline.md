@@ -10,7 +10,7 @@
 
 ## 前置条件与边界
 
-- Day 0 已完成，能够进入 Jetson 上的仓库并恢复终端会话。
+- Day 0 已完成，能够在 Jetson 终端进入课程仓库。
 - 当前单元只需要 Python、OpenCV、NumPy 和普通文件系统，不需要 PyTorch、摄像头或 GPU 指标。
 - 所有命令都从仓库根目录执行。示例中的 `~/jetson-stu` 应替换为 Jetson 上的真实仓库路径。
 - `perception/inputs/` 与 `perception/outputs/` 被 Git 忽略；课程保留生成方法和证据，不强制提交生成图片。
@@ -33,7 +33,7 @@
 
 ## 本单元产物
 
-- 你今天提交/保留：两个输入图、两个输出图、脚本和一段错误输入日志。
+- 本单元产物：两个输入图、两个输出图、脚本和一段错误输入日志。
 - 成功标准：换一张图仍能运行；给错路径时能解释报错。
 
 ## 操作教程
@@ -96,7 +96,7 @@ file perception/inputs/wide.png perception/inputs/tall.png
 
 创建 `perception/image_pipeline.py`。先读代码，再亲手输入或粘贴；注意参数、错误处理和输出目录各自承担的职责。
 
-完整文件：[展开 `image_pipeline.py`](#course-file:perception/image_pipeline.py)。它就是当天应保留的真实源码，前端显示的内容会随该文件同步更新。
+完整文件：[查看 `image_pipeline.py`](#course-file:perception/image_pipeline.py)。请先通读源码，再按步骤运行和修改。
 
 关键解释：
 
