@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   BookOpen, CaretDown, CaretRight, CheckCircle, Circle, Clock,
   CaretUp, Code, Compass, Cube, FileCode, ListChecks, PlayCircle, RocketLaunch, Target, WechatLogo,
@@ -104,7 +105,7 @@ function CourseMarkdown({ children, onOpenCode }) {
     a: ({ href, children: linkChildren }) => href?.startsWith('#course-file:')
       ? <button className="source-link" onClick={() => onOpenCode(href.slice('#course-file:'.length))}><FileCode size={17} />{linkChildren}</button>
       : <a href={href} target="_blank" rel="noreferrer">{linkChildren}</a>,
-  }}>{children}</ReactMarkdown>;
+  }} remarkPlugins={[remarkGfm]}>{children}</ReactMarkdown>;
 }
 
 function SourceDialog({ path, source, onClose }) {
