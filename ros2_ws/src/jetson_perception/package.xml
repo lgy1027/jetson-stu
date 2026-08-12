@@ -18,4 +18,9 @@
 
   <test_depend>ament_pytest</test_depend>
   <test_depend>python3-yaml</test_depend>
+
+  <export>
+    <!-- 告诉 colcon 这是 Python 包，构建时应执行 setup.py。 -->
+    <build_type>ament_python</build_type>
+  </export>
 </package>

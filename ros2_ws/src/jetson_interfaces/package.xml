@@ -12,4 +12,9 @@
   <depend>std_msgs</depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <!-- 接口包使用 ament_cmake 生成并安装消息代码。 -->
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

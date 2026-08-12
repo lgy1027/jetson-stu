@@ -20,6 +20,8 @@ setup(
     maintainer_email="lgy10271416@gmail.com",
     description="Offline perception nodes used by the Jetson embodied AI course.",
     license="Apache-2.0",
+    # colcon test 会据此使用 pytest 收集 test/ 目录中的测试。
+    tests_require=["pytest"],
     entry_points={
         "console_scripts": [
             "hello_publisher = jetson_perception.hello_publisher:main",
