@@ -69,8 +69,8 @@ def parse_args():
     parser = ArgumentParser(description="Classify images and save JSON plus annotated images")
     parser.add_argument("input_dir", type=Path)
     parser.add_argument("output_dir", type=Path)
-    parser.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda:0"])
-    parser.add_argument("--top-k", type=int, default=3)
+    parser.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda:0"], help="推理设备")
+    parser.add_argument("--top-k", type=int, default=3, help="保留分数最高的类别数量")
     return parser.parse_args()
 
 

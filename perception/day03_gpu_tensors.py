@@ -37,6 +37,7 @@ def main() -> None:
     if args.size <= 0 or args.repeats <= 0:
         raise SystemExit("--size and --repeats must be greater than zero")
     size, repeats = args.size, args.repeats
+    # size 是方阵边长，repeats 是重复计算次数；两者越大，耗时和内存占用越高。
     print("torch:", torch.__version__)
     print("cuda runtime:", torch.version.cuda)
     print("cuda available:", torch.cuda.is_available())
@@ -50,6 +51,7 @@ def main() -> None:
     left = torch.randn((size, size), generator=generator)
     right = torch.randn((size, size), generator=generator)
     cpu_result, cpu_ms = timed_matmul(left, right, torch.device("cpu"), repeats)
+    # CPU 和 GPU 使用同一组输入，最后比较结果误差和耗时。
     gpu_result, gpu_ms = timed_matmul(left, right, gpu, repeats)
     max_error = (cpu_result - gpu_result.cpu()).abs().max().item()
     print(f"workload: {repeats} x {size}x{size} matrix multiply")

@@ -16,8 +16,8 @@ def parse_args():
     parser = ArgumentParser(description="Run Day 4 classifier over video")
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda:0"])
-    parser.add_argument("--every", type=int, default=5, help="run inference once every N frames")
+    parser.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda:0"], help="推理设备")
+    parser.add_argument("--every", type=int, default=5, help="每隔多少帧推理一次")
     return parser.parse_args()
 
 

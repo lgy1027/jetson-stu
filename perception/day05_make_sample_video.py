@@ -16,10 +16,10 @@ def parse_args():
     parser = ArgumentParser(description="Create a reproducible sample video from an image directory")
     parser.add_argument("input_dir", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--fps", type=float, default=10.0)
-    parser.add_argument("--frames-per-image", type=int, default=10)
-    parser.add_argument("--width", type=int, default=640)
-    parser.add_argument("--height", type=int, default=480)
+    parser.add_argument("--fps", type=float, default=10.0, help="输出视频帧率")
+    parser.add_argument("--frames-per-image", type=int, default=10, help="每张图片重复的帧数")
+    parser.add_argument("--width", type=int, default=640, help="视频宽度")
+    parser.add_argument("--height", type=int, default=480, help="视频高度")
     return parser.parse_args()
 
 

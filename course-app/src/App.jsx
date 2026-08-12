@@ -112,7 +112,7 @@ function SourceDialog({ path, source, onClose }) {
   if (!path || !source) return null;
   return <div className="source-modal-backdrop" role="presentation" onMouseDown={onClose}>
     <section className="source-modal" role="dialog" aria-modal="true" aria-label={`源码：${path}`} onMouseDown={(event) => event.stopPropagation()}>
-      <div className="source-file-head"><div><p className="eyebrow">COURSE SOURCE · LIVE FILE</p><h2><FileCode size={22} /> {path}</h2><p>这是仓库中的真实文件；修改它后，课程中的完整源码会同步更新。</p></div><button className="source-close" onClick={onClose}><CaretUp size={17} /> 收起代码</button></div>
+      <div className="source-file-head"><div><p className="eyebrow">COURSE SOURCE · LIVE FILE</p><h2><FileCode size={22} /> {path}</h2><p>这里显示课程实际使用的完整 Python 源码，包括中文注释。</p></div><button className="source-close" onClick={onClose}><CaretUp size={17} /> 收起代码</button></div>
       <pre><code>{source}</code></pre>
     </section>
   </div>;
