@@ -1,4 +1,4 @@
-"""Run a pretrained MobileNet classifier over a directory of images."""
+"""用预训练 MobileNet 对目录中的图片分类。"""
 
 from __future__ import annotations
 
@@ -15,8 +15,7 @@ from torchvision.models import MobileNet_V3_Small_Weights, mobilenet_v3_small
 
 class ImageClassifier:
     def __init__(self, device: str = "auto") -> None:
-        # auto 只在调用方没有指定设备时选择 CUDA。显式请求 cuda 时不能
-        # 静默回退到 CPU，否则课程会把“GPU 不可用”误判成部署成功。
+        # auto 自动选设备；显式指定 cuda 时不回退 CPU。
         if device == "auto":
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
         if device.startswith("cuda") and not torch.cuda.is_available():
@@ -39,8 +38,7 @@ class ImageClassifier:
         # OpenCV 是 BGR，PIL/torchvision 预处理按 RGB 工作，因此这里必须转换。
         image_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         tensor = self.preprocess(Image.fromarray(image_rgb)).unsqueeze(0).to(self.device)
-        # CUDA 默认异步执行。如果不在计时前后同步，计时器可能只测到
-        # kernel 被提交到队列的时间，而不是模型真正完成计算的时间。
+        # CUDA 异步执行，前后同步后再计时，结果才可信。
         if self.device.type == "cuda":
             torch.cuda.synchronize(self.device)
         started = time.perf_counter()

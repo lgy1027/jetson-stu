@@ -1,4 +1,4 @@
-"""Compare one deterministic matrix workload on CPU and CUDA."""
+"""比较 CPU 和 CUDA 上的矩阵乘法。"""
 
 from __future__ import annotations
 
@@ -9,16 +9,11 @@ import torch
 
 
 def timed_matmul(left: torch.Tensor, right: torch.Tensor, device: torch.device, repeats: int) -> tuple[torch.Tensor, float]:
-    """Run the same matrix workload on one device and measure only the math.
-
-    CUDA launches are asynchronous, so synchronization before and after the
-    measured region is required. The warm-up operation removes one-time backend
-    initialization from the comparison.
-    """
+    """在指定设备上运行矩阵乘法，并只统计计算耗时。"""
     # 复制到目标设备；预热和同步分别避免首次初始化及异步队列干扰计时。
     left = left.to(device)
     right = right.to(device)
-    _ = left @ right  # initialize backend/library work outside the measured region
+    _ = left @ right  # 预热，排除首次调用的初始化耗时
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     started = time.perf_counter()

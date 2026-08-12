@@ -1,4 +1,4 @@
-"""Build a deterministic short MP4 from the licensed Day 4 image set."""
+"""用 Day 4 图片生成固定内容的短视频。"""
 
 from __future__ import annotations
 
@@ -24,8 +24,7 @@ def parse_args():
 
 
 def fit_with_letterbox(image, width: int, height: int):
-    # 先按较小缩放比例调整图片，再用背景填充剩余区域。这样每一帧
-    # 都符合 writer 的固定尺寸要求，同时不会拉伸 Day 4 的输入图片。
+    # 等比例缩放后补背景，保证统一尺寸且不拉伸图片。
     old_height, old_width = image.shape[:2]
     scale = min(width / old_width, height / old_height)
     resized = cv2.resize(image, (round(old_width * scale), round(old_height * scale)))

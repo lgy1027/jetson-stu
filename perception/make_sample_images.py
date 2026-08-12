@@ -14,7 +14,7 @@ def write_image(path: Path, image: np.ndarray) -> None:
 def main() -> None:
     out_dir = Path("perception/inputs")
 
-    # 构造固定尺寸和内容的样本图，让每位学习者从同一输入开始。
+    # 生成固定尺寸和内容的样本图，方便重复练习。
     wide = np.zeros((360, 640, 3), dtype=np.uint8)
     wide[:] = (40, 110, 30)  # OpenCV 使用 BGR
     cv2.circle(wide, (320, 180), 95, (40, 220, 255), -1)
