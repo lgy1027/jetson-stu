@@ -10,7 +10,11 @@ import numpy as np
 
 
 def resize_keep_aspect(image: np.ndarray, width: int) -> np.ndarray:
-    """Resize BGR image to width while preserving its aspect ratio."""
+    """Resize a BGR image while preserving its aspect ratio.
+
+    The caller supplies only the target width. Deriving the height here keeps
+    this transformation deterministic and prevents accidental image stretching.
+    """
     if width <= 0:
         raise ValueError("width must be greater than zero")
     # 只指定目标宽度，高度由原始比例推导，避免拉伸图像。
@@ -22,7 +26,11 @@ def resize_keep_aspect(image: np.ndarray, width: int) -> np.ndarray:
 
 
 def center_crop(image: np.ndarray, crop_width: int, crop_height: int) -> np.ndarray:
-    """Return a centered crop; reject a crop that does not fit the input."""
+    """Return a centered crop and reject dimensions outside the input image.
+
+    A copied array is returned so later annotation or preprocessing cannot
+    mutate a view into the original input image.
+    """
     height, width = image.shape[:2]
     if crop_width <= 0 or crop_height <= 0:
         raise ValueError("crop dimensions must be greater than zero")
@@ -35,7 +43,11 @@ def center_crop(image: np.ndarray, crop_width: int, crop_height: int) -> np.ndar
 
 
 def bgr_to_normalized_rgb(image: np.ndarray) -> np.ndarray:
-    """Convert uint8 BGR data into float32 RGB values in the [0, 1] range."""
+    """Convert uint8 BGR data into float32 RGB values in the [0, 1] range.
+
+    OpenCV uses BGR by default, while most model preprocessing expects RGB.
+    The dtype check catches accidental re-normalization or unsupported inputs.
+    """
     if image.dtype != np.uint8:
         raise ValueError(f"expected uint8 BGR image, got {image.dtype}")
     # OpenCV 读入的是 BGR；模型常用 RGB，且归一化到 [0, 1] 便于后续张量处理。
@@ -43,7 +55,11 @@ def bgr_to_normalized_rgb(image: np.ndarray) -> np.ndarray:
 
 
 def annotate_detections(image: np.ndarray, detections: list[dict]) -> np.ndarray:
-    """Draw xyxy boxes, labels and scores without changing the input array."""
+    """Draw ``xyxy`` boxes, labels and scores on a copy of the input image.
+
+    The structured detection list remains the source of truth; this function
+    creates only the human-readable visualization and leaves the input intact.
+    """
     # 可视化只修改副本，保留原始输入用于后续数值处理和对照。
     annotated = image.copy()
     for item in detections:

@@ -9,7 +9,12 @@ import torch
 
 
 def timed_matmul(left: torch.Tensor, right: torch.Tensor, device: torch.device, repeats: int) -> tuple[torch.Tensor, float]:
-    """Time only the math, using the same inputs on CPU and GPU."""
+    """Run the same matrix workload on one device and measure only the math.
+
+    CUDA launches are asynchronous, so synchronization before and after the
+    measured region is required. The warm-up operation removes one-time backend
+    initialization from the comparison.
+    """
     # 复制到目标设备；预热和同步分别避免首次初始化及异步队列干扰计时。
     left = left.to(device)
     right = right.to(device)
@@ -44,7 +49,8 @@ def main() -> None:
         raise SystemExit("CUDA is unavailable; stop here and resolve the Day 3 install path.")
     gpu = torch.device("cuda:0")
     print("gpu:", torch.cuda.get_device_name(gpu))
-    # 固定随机种子，让 CPU/GPU 使用完全相同的输入，结果才可比较。
+    # 固定随机种子，让 CPU/GPU 使用完全相同的输入；否则误差和耗时差异
+    # 可能来自不同数据，而不是来自计算设备本身。
     generator = torch.Generator(device="cpu").manual_seed(7)
     left = torch.randn((size, size), generator=generator)
     right = torch.randn((size, size), generator=generator)

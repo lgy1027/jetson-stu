@@ -27,7 +27,8 @@ def main() -> None:
         raise ValueError("--every must be greater than zero")
     if args.input.resolve() == args.output.resolve():
         raise ValueError("input and output video paths must be different")
-    # 先打开输入并读取媒体属性，writer 必须使用相同的 FPS 和帧尺寸。
+    # 先打开输入并读取媒体属性。输出 writer 使用输入 FPS 和帧尺寸，
+    # 才能保持视频的播放速度和编码器要求，避免输出文件无法播放。
     capture = cv2.VideoCapture(str(args.input))
     if not capture.isOpened():
         raise FileNotFoundError(f"cannot open video: {args.input}")
@@ -48,7 +49,8 @@ def main() -> None:
             ok, frame = capture.read()
             if not ok:
                 break
-            # 只在采样帧推理，其他帧复用最近结果，体现吞吐与更新频率的取舍。
+            # 只在采样帧调用模型，其他帧复用最近一次结果。这样可以用
+            # --every 控制推理开销和标签更新频率，但它不是目标跟踪算法。
             if frame_index % args.every == 0:
                 latest_results, latest_latency = classifier.predict_bgr(frame)
                 inference_count += 1
@@ -59,7 +61,8 @@ def main() -> None:
             writer.write(annotated)
             frame_index += 1
     finally:
-        # 无论推理或写盘是否报错，都必须释放输入和输出句柄。
+        # 无论模型初始化、读取帧还是写盘是否报错，都必须释放输入和
+        # 输出句柄，否则 MP4 尾部索引可能未写完，文件也可能被锁定。
         capture.release()
         writer.release()
     if frame_index == 0:
