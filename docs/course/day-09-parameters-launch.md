@@ -93,6 +93,9 @@ ros2 topic echo /perception/detections --once
 
 ```bash
 # 阈值超出 0~1，节点应在启动时明确失败。
+cd ~/jetson-stu
+source /opt/ros/jazzy/setup.bash
+source ros2_ws/install/setup.bash
 ros2 run jetson_perception image_perception --ros-args \
   -p score_threshold:=1.5
 echo "exit code: $?"
@@ -108,9 +111,12 @@ echo "exit code: $?"
 # 用 colcon 执行包测试并查看详细结果。
 cd ~/jetson-stu/ros2_ws
 source /opt/ros/jazzy/setup.bash
+source install/setup.bash
 colcon test --packages-select jetson_perception
 colcon test-result --verbose
 ```
+
+预期结果为 `2 tests, 0 errors, 0 failures`。测试检查 YAML 的关键参数和 Launch、资源文件是否存在。
 
 ## 常见问题
 

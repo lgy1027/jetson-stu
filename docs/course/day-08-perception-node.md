@@ -1,6 +1,6 @@
 # Day 8：把离线感知接入 ROS 2
 
-> 今天把 Day 1–2 的文件输入、错误检查和标注输出包装成 ROS 2 节点。
+> 今天沿用 Day 1–2 的文件输入、错误检查和标注输出边界，把它们组织成 ROS 2 节点。
 
 ## 今天的问题
 
@@ -38,6 +38,8 @@ cd ~/jetson-stu
 python3 perception/make_sample_images.py
 file perception/inputs/wide.png
 ```
+
+预期看到 `wide.png` 的尺寸为 `640 x 360`。如果这里提示 `cv2` 不存在，先完成 Day 6 的 `python3-opencv` 安装。
 
 构建 ROS 2 包：
 
@@ -110,6 +112,9 @@ timeout 10 ros2 topic hz /perception/detections \
 
 ```bash
 # 使用不存在的图片，节点应发布 error 状态，而不是发布伪检测。
+cd ~/jetson-stu
+source /opt/ros/jazzy/setup.bash
+source ros2_ws/install/setup.bash
 ros2 run jetson_perception image_perception --ros-args \
   -p input_path:=perception/inputs/not-here.png \
   -p publish_period:=1.0
@@ -119,6 +124,8 @@ ros2 run jetson_perception image_perception --ros-args \
 
 ```bash
 # 只取一条错误状态。
+source /opt/ros/jazzy/setup.bash
+source ~/jetson-stu/ros2_ws/install/setup.bash
 ros2 topic echo /perception/status --once
 ```
 

@@ -34,6 +34,15 @@
 
 一帧结果包含：时间戳、`frame_id`、输入来源和检测数组；每个检测包含类别、分数和二维框。
 
+| 字段 | 作用 |
+|---|---|
+| `header.stamp` | 标记这一帧数据产生的 ROS 时间，便于同步和判断数据是否过期 |
+| `header.frame_id` | 指明检测结果所属坐标系，本阶段固定为 `camera` |
+| `source_image` | 保留输入来源，回查结果时能找到对应图片 |
+| `detections` | 一帧中的零个或多个检测结果 |
+| `label` / `score` | 类别名和置信度，阈值过滤会使用 `score` |
+| `x_min`～`y_max` | 图像像素坐标中的二维框，原点位于左上角 |
+
 ### 2. 重新构建消息和节点
 
 ```bash
@@ -105,8 +114,13 @@ ros2 topic info /perception/detections --verbose
 
 ### 5. 验证参数错误
 
+停止终端 A 的模拟发布者，再在同一终端执行：
+
 ```bash
 # publish_period 小于等于 0 时，节点必须明确失败。
+cd ~/jetson-stu
+source /opt/ros/jazzy/setup.bash
+source ros2_ws/install/setup.bash
 ros2 run jetson_perception detection_publisher --ros-args \
   -p publish_period:=0.0
 echo "exit code: $?"

@@ -171,7 +171,7 @@ echo "exit code: $?"
 
 ## 与后续课程的连接
 
-Day 5 复用同一个 `ImageClassifier` 进入视频循环；Day 8 会把后端包装进 ROS 2；Day 11 会冻结输入输出并导出 ONNX。这里保留的不可信样例会进入后续失败分类和安全拒绝测试。
+Day 5 复用同一个 `ImageClassifier` 进入视频循环；Day 8 先用固定检测结果学习 ROS 2 节点和消息边界；Day 11–15 再完成 ONNX、TensorRT 与稳定后端接口。这里保留的不可信样例会进入后续失败分类和安全拒绝测试。
 
 ## 复盘
 

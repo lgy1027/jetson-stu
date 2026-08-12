@@ -33,6 +33,12 @@
 # bag 和诊断记录都保存在项目对应目录；这些生成物不会提交 Git。
 cd ~/jetson-stu
 mkdir -p ros2_ws/bags diagnostics/day10
+
+# ros2 bag 不会覆盖同名目录；重复学习时先把旧证据改名保留。
+if [ -d ros2_ws/bags/day10 ]; then
+  mv ros2_ws/bags/day10 "ros2_ws/bags/day10.backup-$(date +%Y%m%d-%H%M%S)"
+fi
+
 source /opt/ros/jazzy/setup.bash
 source ros2_ws/install/setup.bash
 ```
@@ -114,6 +120,8 @@ ros2 bag play ros2_ws/bags/day10 --clock
 ```
 
 监听器应重新收到和录制阶段相同类型的检测结果。
+
+`--clock` 会额外发布 `/clock`。本课监听器使用消息中已经录制的时间戳，不依赖仿真时间；后续节点若启用 `use_sim_time`，才会主动使用 `/clock`。
 
 ### 6. 验证回放边界
 

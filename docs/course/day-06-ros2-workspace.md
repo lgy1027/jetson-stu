@@ -39,13 +39,47 @@ uname -m
 command -v ros2 || true
 ```
 
-在 Ubuntu 24.04 ARM64 上，本课程使用 ROS 2 Jazzy。若 `ros2` 不存在，先按 [ROS 2 Jazzy Ubuntu 安装说明](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html) 配置官方软件源，再安装开发所需组件：
+在 Ubuntu 24.04 ARM64 上，本课程使用 ROS 2 Jazzy。若 `ros2` 已存在，可直接跳到“安装课程依赖”。如果尚未安装，先执行下面的软件源配置。
 
 ```bash
-# 软件源配置完成后，安装 ROS Base 和构建工具。
+# ROS 2 要求 UTF-8 locale；先确认当前终端满足要求。
+locale | grep -E '^(LANG|LC_ALL)=' || true
+
+# 启用 Ubuntu Universe 仓库，并安装下载 ROS 软件源包所需的工具。
 sudo apt update
-sudo apt install -y ros-jazzy-ros-base ros-dev-tools python3-colcon-common-extensions
+sudo apt install -y locales software-properties-common curl
+sudo add-apt-repository universe
+
+# 若上面的 locale 不是 UTF-8，生成并启用 en_US.UTF-8。
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# 获取 ros-apt-source 最新版本号，再下载与当前 Ubuntu 代号匹配的软件源包。
+export ROS_APT_SOURCE_VERSION="$(
+  curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest \
+    | grep -F 'tag_name' | awk -F'"' '{print $4}'
+)"
+export UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")"
+curl -L -o /tmp/ros2-apt-source.deb \
+  "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.${UBUNTU_CODENAME}_all.deb"
+sudo dpkg -i /tmp/ros2-apt-source.deb
 ```
+
+安装课程依赖：
+
+```bash
+# ROS Base 提供核心命令；其余包用于构建、依赖解析、OpenCV 和 YAML 测试。
+sudo apt update
+sudo apt install -y \
+  ros-jazzy-ros-base \
+  ros-dev-tools \
+  python3-colcon-common-extensions \
+  python3-opencv \
+  python3-yaml
+```
+
+以上软件源配置来自 [ROS 2 Jazzy 官方 Ubuntu 安装说明](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)。只有系统确认为 Ubuntu 24.04 时才使用 `jazzy`，不要在其他 Ubuntu 版本上强行安装。
 
 然后加载 ROS 环境并检查：
 
@@ -65,10 +99,11 @@ python3 -c 'import rclpy; print("rclpy: OK")'
 
 - [查看 `package.xml`](#course-file:ros2_ws/src/jetson_perception/package.xml)
 - [查看 `setup.py`](#course-file:ros2_ws/src/jetson_perception/setup.py)
+- [查看接口包的 `package.xml`](#course-file:ros2_ws/src/jetson_interfaces/package.xml)
 - [查看 `hello_publisher.py`](#course-file:ros2_ws/src/jetson_perception/jetson_perception/hello_publisher.py)
 - [查看 `hello_subscriber.py`](#course-file:ros2_ws/src/jetson_perception/jetson_perception/hello_subscriber.py)
 
-`package.xml` 声明 ROS 依赖；`setup.py` 把 Python 函数注册为 `ros2 run` 可调用的入口。
+`package.xml` 声明 ROS 依赖和构建类型；`setup.py` 把 Python 函数注册为 `ros2 run` 可调用的入口。仓库中还预置了 `jetson_interfaces`，因为 `jetson_perception` 已声明对它的依赖；Day 6 先一起构建，Day 7 再学习它的消息定义。
 
 ### 3. 安装依赖并构建
 
@@ -76,12 +111,20 @@ python3 -c 'import rclpy; print("rclpy: OK")'
 # 从 workspace 根目录安装声明的依赖，并只构建课程的两个包。
 cd ~/jetson-stu/ros2_ws
 mkdir -p ../diagnostics/day06
+
+# rosdep 首次使用时初始化系统索引；已经初始化则不会重复执行。
+test -f /etc/ros/rosdep/sources.list.d/20-default.list || sudo rosdep init
+rosdep update
+
+# 根据两个 package.xml 安装尚未满足的系统依赖。
 rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install --packages-select jetson_interfaces jetson_perception \
   | tee ../diagnostics/day06/build.txt
 ```
 
 `--symlink-install` 让 Python 源码修改后无需每次复制安装；修改消息定义或 `setup.py` 后仍需重新构建。
+
+构建完成后应看到 `Summary: 2 packages finished`。如果出现失败，先处理日志中最早出现的错误，不要只看最后一行。
 
 ### 4. 运行发布者和订阅者
 
