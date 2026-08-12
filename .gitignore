@@ -42,4 +42,5 @@ perception/outputs/
 *.key
 
 # Per-device evidence (may contain hostnames, versions, and runtime details)
-diagnostics/day0*/
+diagnostics/day*/
+ros2_ws/bags/

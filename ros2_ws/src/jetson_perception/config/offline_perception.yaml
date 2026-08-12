@@ -1,0 +1,7 @@
+image_perception:
+  ros__parameters:
+    input_path: perception/inputs/wide.png
+    output_path: perception/outputs/ros2/annotated.png
+    frame_id: camera
+    score_threshold: 0.5
+    publish_period: 1.0

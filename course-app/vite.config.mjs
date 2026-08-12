@@ -14,6 +14,7 @@ const courseOrder = [
 ];
 const courseDir = path.resolve(import.meta.dirname, '../docs/course');
 const repositoryRoot = path.resolve(import.meta.dirname, '..');
+const rosSourceDir = path.join(repositoryRoot, 'ros2_ws', 'src');
 const virtualCoursewareId = 'virtual:jetson-courseware';
 const resolvedVirtualCoursewareId = `\0${virtualCoursewareId}`;
 
@@ -83,9 +84,12 @@ function coursewarePlugin() {
     configureServer(server) {
       server.watcher.add(courseDir);
       server.watcher.add(path.join(repositoryRoot, 'perception'));
+      server.watcher.add(rosSourceDir);
     },
     handleHotUpdate({ file, server }) {
-      if (!file.startsWith(courseDir) && !file.startsWith(path.join(repositoryRoot, 'perception'))) return;
+      if (!file.startsWith(courseDir)
+        && !file.startsWith(path.join(repositoryRoot, 'perception'))
+        && !file.startsWith(rosSourceDir)) return;
       const module = server.moduleGraph.getModuleById(resolvedVirtualCoursewareId);
       if (module) server.moduleGraph.invalidateModule(module);
       server.ws.send({ type: 'full-reload' });
