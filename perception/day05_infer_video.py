@@ -27,6 +27,7 @@ def main() -> None:
         raise ValueError("--every must be greater than zero")
     if args.input.resolve() == args.output.resolve():
         raise ValueError("input and output video paths must be different")
+    # 先打开输入并读取媒体属性，writer 必须使用相同的 FPS 和帧尺寸。
     capture = cv2.VideoCapture(str(args.input))
     if not capture.isOpened():
         raise FileNotFoundError(f"cannot open video: {args.input}")
@@ -47,6 +48,7 @@ def main() -> None:
             ok, frame = capture.read()
             if not ok:
                 break
+            # 只在采样帧推理，其他帧复用最近结果，体现吞吐与更新频率的取舍。
             if frame_index % args.every == 0:
                 latest_results, latest_latency = classifier.predict_bgr(frame)
                 inference_count += 1
@@ -57,6 +59,7 @@ def main() -> None:
             writer.write(annotated)
             frame_index += 1
     finally:
+        # 无论推理或写盘是否报错，都必须释放输入和输出句柄。
         capture.release()
         writer.release()
     if frame_index == 0:

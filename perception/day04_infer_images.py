@@ -15,6 +15,7 @@ from torchvision.models import MobileNet_V3_Small_Weights, mobilenet_v3_small
 
 class ImageClassifier:
     def __init__(self, device: str = "auto") -> None:
+        # 显式 cuda 请求不能静默回退到 CPU，否则会掩盖部署环境问题。
         if device == "auto":
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
         if device.startswith("cuda") and not torch.cuda.is_available():
@@ -23,6 +24,7 @@ class ImageClassifier:
         self.weights = MobileNet_V3_Small_Weights.DEFAULT
         self.model_name = "mobilenet_v3_small"
         self.weights_name = self.weights.name
+        # 使用权重自带预处理，保证尺寸、颜色和归一化与模型训练契约一致。
         self.preprocess = self.weights.transforms()
         self.categories = self.weights.meta["categories"]
         self.model = mobilenet_v3_small(weights=self.weights).eval().to(self.device)
@@ -33,8 +35,10 @@ class ImageClassifier:
             raise ValueError("cannot classify an empty image")
         if not 1 <= top_k <= len(self.categories):
             raise ValueError(f"top_k must be between 1 and {len(self.categories)}")
+        # OpenCV 是 BGR，PIL/torchvision 预处理按 RGB 工作，因此这里必须转换。
         image_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         tensor = self.preprocess(Image.fromarray(image_rgb)).unsqueeze(0).to(self.device)
+        # CUDA 默认异步执行；同步把计时边界固定在真实前向计算两侧。
         if self.device.type == "cuda":
             torch.cuda.synchronize(self.device)
         started = time.perf_counter()
@@ -76,6 +80,7 @@ def main() -> None:
         raise SystemExit(f"input directory does not exist: {args.input_dir}")
     if args.top_k <= 0:
         raise SystemExit("--top-k must be greater than zero")
+    # 固定排序保证每次运行的处理顺序和 JSON 记录可复现。
     paths = sorted(path for path in args.input_dir.iterdir() if path.suffix.lower() in {".jpg", ".jpeg", ".png"})
     if not paths:
         raise SystemExit(f"no jpg/jpeg/png files found in {args.input_dir}")
@@ -85,6 +90,7 @@ def main() -> None:
     skipped = []
     for path in paths:
         frame = cv2.imread(str(path))
+        # 单张图片解码失败只进入 skipped，不让一张坏图伪造整批成功。
         if frame is None:
             print("SKIP unreadable:", path)
             skipped.append({"input": str(path), "reason": "OpenCV could not decode image"})

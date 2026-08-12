@@ -24,6 +24,7 @@ def parse_args():
 
 
 def fit_with_letterbox(image, width: int, height: int):
+    # 等比例缩放后填充背景，保证所有视频帧拥有统一尺寸且不变形。
     old_height, old_width = image.shape[:2]
     scale = min(width / old_width, height / old_height)
     resized = cv2.resize(image, (round(old_width * scale), round(old_height * scale)))
@@ -45,6 +46,7 @@ def main() -> None:
         raise SystemExit(f"no jpg/jpeg/png files found in {args.input_dir}")
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    # 使用固定编码器、FPS 和尺寸，生成可重复检查的短视频。
     writer = cv2.VideoWriter(
         str(args.output),
         cv2.VideoWriter_fourcc(*"mp4v"),
@@ -55,6 +57,7 @@ def main() -> None:
         raise OSError(f"cannot create sample video: {args.output}")
 
     written = 0
+    # 无论中途是否遇到坏图，都在 finally 中释放 writer。
     try:
         for path in paths:
             image = cv2.imread(str(path))

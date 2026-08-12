@@ -5,6 +5,7 @@ import numpy as np
 
 
 def write_image(path: Path, image: np.ndarray) -> None:
+    # 生成目录并检查写入结果，避免后续步骤读取到不存在或空文件。
     path.parent.mkdir(parents=True, exist_ok=True)
     if not cv2.imwrite(str(path), image):
         raise OSError(f"failed to write sample image: {path}")
@@ -13,6 +14,7 @@ def write_image(path: Path, image: np.ndarray) -> None:
 def main() -> None:
     out_dir = Path("perception/inputs")
 
+    # 构造固定尺寸和内容的样本图，让每位学习者从同一输入开始。
     wide = np.zeros((360, 640, 3), dtype=np.uint8)
     wide[:] = (40, 110, 30)  # OpenCV 使用 BGR
     cv2.circle(wide, (320, 180), 95, (40, 220, 255), -1)
